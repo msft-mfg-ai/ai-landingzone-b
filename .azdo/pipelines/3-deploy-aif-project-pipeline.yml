@@ -26,11 +26,11 @@ parameters:
     displayName: Deploy To
     type: string
     values:
-      - DEV
-      - QA
-      - PROD
-      - DEV-QA-PROD
-    default: DEV
+      - DV
+      - TS
+      - PD
+      - DV-TS-PD
+    default: DV
   - name: deploymentMode
     displayName: Deploy Mode
     type: string
@@ -63,7 +63,7 @@ variables:
 
 # ----------------------------------------------------------------------------------------------------
 stages:
-  - ${{ if ne(parameters.deployToEnvironment, 'DEV-QA-PROD') }}:
+  - ${{ if ne(parameters.deployToEnvironment, 'DV-TS-PD') }}:
       - template: pipes/infra-only-pipe.yml
         parameters:
           environments: ['${{ parameters.deployToEnvironment }}']
@@ -76,10 +76,10 @@ stages:
           addRoleAssignments: 'true'
           runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
 
-  - ${{ if eq(parameters.deployToEnvironment, 'DEV-QA-PROD') }}:
+  - ${{ if eq(parameters.deployToEnvironment, 'DV-TS-PD') }}:
       - template: pipes/infra-only-pipe.yml
         parameters:
-          environments: ['DEV', 'QA', 'PROD']
+          environments: ['DV', 'TS', 'PD']
           bicepVersion: 'project'
           projectName: ${{ parameters.projectName }}
           projectNumber: ${{ parameters.projectNumber }}

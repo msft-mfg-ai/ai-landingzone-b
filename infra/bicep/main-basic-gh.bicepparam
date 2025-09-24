@@ -20,9 +20,11 @@ param principalId = '#{USER_PRINCIPAL_ID}#'
 param instanceNumber = '#{INSTANCE_NUMBER}#'
 param regionCode = '#{GLOBAL_REGION_CODE}#' 
 
-param businessOwnerTag  = '#{BUSINESS_OWNER}#'
-param applicationOwnerTag  = '#{APPLICATION_OWNER}#'
-param costCenterTag  = '#{COST_CENTER}#'
+param logRetentionInDays = empty('#{LOG_RETENTION_DAYS}#') ? 365 : int('#{LOG_RETENTION_DAYS}#')
+
+// param businessOwnerTag  = '#{BUSINESS_OWNER}#'
+// param applicationOwnerTag  = '#{APPLICATION_OWNER}#'
+// param costCenterTag  = '#{COST_CENTER}#'
 
 param gpt40_DeploymentCapacity = empty('#{AI_MODEL_CAPACITY}#') ? null : int('#{AI_MODEL_CAPACITY}#')
 param gpt41_DeploymentCapacity = empty('#{AI_MODEL_CAPACITY}#') ? null : int('#{AI_MODEL_CAPACITY}#')

@@ -55,15 +55,17 @@ Follow these steps to get started quickly:
     gh variable set ENVCODE -b Dev
     ```
 
+<!-- 
     For resource tags, set these variables:
 
     ```bash
+    gh variable set CREATED_BY -b SomeCreator
     gh variable set APPLICATION_OWNER -b SomeAppOwner
     gh variable set BUSINESS_OWNER -b SomeBusOwner
     gh variable set COST_CENTER -b 9999999
-    gh variable set CREATED_BY -b SomeCreator
     gh variable set OWNER_EMAIL -b applicationowner@company.com
     ```
+-->
 
     For each environment, you can control the AI Model capacity with this variable:
 

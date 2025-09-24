@@ -11,7 +11,7 @@ on:
         description: Environment
         required: true
         type: environment
-        # default: 'dev'
+        # default: 'dv'
       bicepVersion:
         description: Version - Basic=public, Advanced=VNET
         required: true

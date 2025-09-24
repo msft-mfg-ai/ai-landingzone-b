@@ -45,14 +45,18 @@ To create this variable groups, customize and run this command in the Azure Clou
      --variables `
          APP_NAME='myailz' `
          RESOURCEGROUP_PREFIX='rg-ailz' `
-         COST_CENTER='9999999' `
-         APPLICATION_OWNER='SomeAppOwner' `
-         BUSINESS_OWNER='SomeBusOwner' `
-         CREATED_BY='SomeCreator' `
-         OWNER_EMAIL='applicationowner@company.com' `
+         INSTANCE_NUMBER='001' `
          MY_IP_ADDRESS='<yourPublicIpAddress>' `
          USER_PRINCIPAL_ID='<yourAdminPrincipalId>'
 ```
+
+<!-- 
+     CREATED_BY='SomeCreator' `
+     APPLICATION_OWNER='SomeAppOwner' `
+     BUSINESS_OWNER='SomeBusOwner' `
+     COST_CENTER='9999999' `
+     OWNER_EMAIL='applicationowner@company.com' ` 
+-->
 
 ## Resource Group Name
 
@@ -74,13 +78,13 @@ See [Azure DevOps Service Connections](https://learn.microsoft.com/en-us/azure/d
 
 ```yml
 - name: serviceConnectionName
-  value: 'DEV Service Connection'
-- name: serviceConnectionDEV
-  value: 'DEV Service Connection'
-- name: serviceConnectionQA
-  value: 'QA Service Connection'
-- name: serviceConnectionProd
-  value: 'PROD Service Connection'
+  value: 'DV Service Connection'
+- name: serviceConnectionDV
+  value: 'DV Service Connection'
+- name: serviceConnectionTS
+  value: 'TS Service Connection'
+- name: serviceConnectionPD
+  value: 'PD Service Connection'
 ```
 
 ## Update the Common Variables File with your settings
@@ -96,7 +100,7 @@ Customize your deploy by editing the [vars/var-common.yml](./vars/var-common.yml
 
 ## Update the Environment Specific Variables File with your settings
 
-Customize your deploy by editing the [vars/var-dev.yml](./vars/var-dev.yml) file. This file contains the following variables which you can change:
+Customize your deploy by editing the [vars/var-dv.yml](./vars/var-dv.yml) file. This file contains the following variables which you can change:
 
 ```bash
   - name:   RESOURCEGROUP_LOCATION

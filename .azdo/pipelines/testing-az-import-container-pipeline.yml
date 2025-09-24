@@ -13,8 +13,8 @@ parameters:
     displayName: Run commands in
     type: string
     values:
-      - DEV
-      - QA
+      - DV
+      - TS
   - name: apiImageWithTag
     displayName: Image with Tag
     type: string
@@ -29,10 +29,12 @@ variables:
   - group: AI.LZ.Secrets
   - template: vars/var-service-connections.yml
   # Bring in environment specific variable files
-  - ${{ if eq(lower(parameters.runEnvironment), 'dev') }}:
+  - ${{ if eq(lower(parameters.runEnvironment), 'dv') }}:
       - template: vars/var-dev.yml
-  - ${{ if eq(lower(parameters.runEnvironment), 'qa') }}:
-      - template: vars/var-qa.yml
+  - ${{ if eq(lower(parameters.runEnvironment), 'ts') }}:
+      - template: vars/var-ts.yml
+  - ${{ if eq(lower(parameters.runEnvironment), 'pd') }}:
+      - template: vars/var-pd.yml
   - name: acrName
     value: XXXlabelcrdev
   - name: sourceAcrName
@@ -51,12 +53,12 @@ jobs:
   - task: AzureCLI@2
     displayName: Run import Script
     inputs:
-      AzureSubscription: $(serviceConnectionDev)
+      AzureSubscription: $(serviceConnectionDV)
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
         echo "Running in Resource Group=$(resourceGroupName)"
-        echo "Using Service Connection=$(serviceConnectionDev)"
+        echo "Using Service Connection=$(serviceConnectionDV)"
 
         echo "##[group]Display All Environment Variables:"
         printenv | sort

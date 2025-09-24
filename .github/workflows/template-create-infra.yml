@@ -113,12 +113,12 @@ jobs:
       loginWithFederatedIdentity: ${{ secrets.CICD_CLIENT_SECRET == '' && 'true' || 'false' }}
       loginWithSecret: ${{ secrets.CICD_CLIENT_SECRET != '' && 'true' || 'false' }}
       gitHubRequestorName: ${{ inputs.requestorName }}
-      created-by: ${{ vars.CREATED_BY }}
-      application-owner: ${{ vars.APPLICATION_OWNER }}
-      business-owner: ${{ vars.BUSINESS_OWNER }}
-      cost-center: ${{ vars.COST_CENTER }}
       projectName: ${{ inputs.projectName }}
       projectNumber: ${{ inputs.projectNumber }}
+      #created-by: ${{ vars.CREATED_BY }}
+      # application-owner: ${{ vars.APPLICATION_OWNER }}
+      # business-owner: ${{ vars.BUSINESS_OWNER }}
+      # cost-center: ${{ vars.COST_CENTER }}
  
     # ------------------------------------------------------------------------------------------------------------------------
     # Outputs

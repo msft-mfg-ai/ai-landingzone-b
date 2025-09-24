@@ -60,7 +60,7 @@ This document outlines the structured approach to Azure DevOps YAML pipelines us
 │   └── vars/                                # Variable definitions
 │       ├── var-common.yml                   # Common variables across environments
 │       ├── var-dev.yml                      # Development environment variables
-│       ├── var-qa.yml                       # QA environment variables
+│       ├── var-ts.yml                       # QA environment variables
 │       ├── var-prod.yml                     # Production environment variables
 │       └── var-service-connections.yml      # Azure DevOps service connection variables
 ```
@@ -107,7 +107,7 @@ This document outlines the structured approach to Azure DevOps YAML pipelines us
 
 ### Variable Files
 - **var-common.yml**: Common settings (resource group prefix, location, SKUs, project paths)
-- **var-dev.yml**, **var-qa.yml**, **var-prod.yml**: Environment-specific overrides
+- **var-dev.yml**, **var-ts.yml**, **var-prod.yml**: Environment-specific overrides
 - **var-service-connections.yml**: Azure DevOps service connection configurations
 
 ### Variable Group Requirements
@@ -238,10 +238,10 @@ parameters:
     displayName: Deploy To
     type: string
     values:
-      - DEV
-      - QA
-      - PROD
-    default: DEV
+      - DV
+      - TS
+      - PD
+    default: DV
 
 variables:
   - group: Application.Web
@@ -261,10 +261,10 @@ parameters:
     displayName: Deploy To
     type: string
     values:
-      - DEV
-      - QA
-      - PROD
-    default: DEV
+      - DV
+      - TS
+      - PD
+    default: DV
 
 variables:
   - group: Application.Web

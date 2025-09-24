@@ -13,6 +13,9 @@ param environmentName string = ''
 @description('Primary location for all resources')
 param location string = resourceGroup().location
 
+@description('Number of days to retain logs in Log Analytics workspace')
+param logRetentionInDays int = 365
+
 // --------------------------------------------------------------------------------------------------------------
 // Additional Tags that may be included or not
 // --------------------------------------------------------------------------------------------------------------
@@ -66,6 +69,7 @@ module logAnalytics './modules/monitor/loganalytics.bicep' = {
     newLogAnalyticsName: resourceNames.outputs.logAnalyticsWorkspaceName
     newApplicationInsightsName: resourceNames.outputs.appInsightsName
     location: location
+    retentionInDays: logRetentionInDays
     tags: tags
   }
 }

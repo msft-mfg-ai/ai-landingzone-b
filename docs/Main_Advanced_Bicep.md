@@ -31,7 +31,7 @@ The `main-advanced.bicep` file is designed to deploy an advanced version of the 
 ### Application Configuration
 - `applicationName` (string): Full Application Name
 - `applicationPrefix` (string, default: 'ai_doc'): Prefix for generating unique application name
-- `environmentName` (string, default: 'dev'): Environment code (dev, qa, prod)
+- `environmentName` (string, default: 'dv'): Environment code (dev, qa, prod)
 - `azdEnvName` (string): Environment name used by azd command
 - `location` (string): Primary location for resources
 - `openAI_deploy_location` (string): Region for OpenAI deployment

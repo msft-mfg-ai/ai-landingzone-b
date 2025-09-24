@@ -8,7 +8,7 @@ parameters:
   - name: serviceConnectionName
     type: string
   - name: environmentCode
-    default: 'DEV'
+    default: 'DV'
     type: string
   - name: containerAppName
     default: ''
@@ -34,12 +34,12 @@ jobs:
     variables:
       - group: AI.LZ.Secrets # need to get the appName from here
       # Bring in environment specific variable files
-      - ${{ if eq(lower(parameters.environmentcode), 'dev') }}:
-          - template: ../../vars/var-dev.yml
-      - ${{ if eq(lower(parameters.environmentcode), 'qa') }}:
-          - template: ../../vars/var-qa.yml
-      - ${{ if eq(lower(parameters.environmentcode), 'prod') }}:
-          - template: ../../vars/var-prod.yml
+      - ${{ if eq(lower(parameters.environmentcode), 'dv') }}:
+          - template: ../../vars/var-dv.yml
+      - ${{ if eq(lower(parameters.environmentcode), 'ts') }}:
+          - template: ../../vars/var-ts.yml
+      - ${{ if eq(lower(parameters.environmentcode), 'pd') }}:
+          - template: ../../vars/var-pd.yml
 
     steps:
       # ----------------------------------------------------------------------------------------------------

@@ -29,9 +29,9 @@ param principalId = '#{USER_PRINCIPAL_ID}#'
 param regionCode = '#{GLOBAL_REGION_CODE}#'
 param instanceNumber = '#{INSTANCE_NUMBER}#'
 
-param businessOwnerTag  = '#{BUSINESS_OWNER}#'
-param applicationOwnerTag  = '#{APPLICATION_OWNER}#'
-param costCenterTag  = '#{COST_CENTER}#'
+// param businessOwnerTag  = '#{BUSINESS_OWNER}#'
+// param applicationOwnerTag  = '#{APPLICATION_OWNER}#'
+// param costCenterTag  = '#{COST_CENTER}#'
 
 param createDnsZones = true
 param publicAccessEnabled = false

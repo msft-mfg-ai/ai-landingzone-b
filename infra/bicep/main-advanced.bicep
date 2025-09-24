@@ -223,13 +223,16 @@ param regionCode string = 'US'
 @description('Instance number for the application, e.g. 001, 002, etc. This is used to differentiate multiple instances of the same application in the same environment.')
 param instanceNumber string = '001' // used to differentiate multiple instances of the same application in the same environment
 
+@description('Number of days to retain logs in Log Analytics workspace')
+param logRetentionInDays int = 365
+
 // --------------------------------------------------------------------------------------------------------------
 // Additional Tags that may be included or not
 // --------------------------------------------------------------------------------------------------------------
-param businessOwnerTag string = 'UNKNOWN'
-param applicationOwnerTag string = 'UNKNOWN'
 param createdByTag string = 'UNKNOWN'
-param costCenterTag string = 'UNKNOWN'
+// param businessOwnerTag string = 'UNKNOWN'
+// param applicationOwnerTag string = 'UNKNOWN'
+// param costCenterTag string = 'UNKNOWN'
 
 // --------------------------------------------------------------------------------------------------------------
 // A variable masquerading as a parameter to allow for dynamic value assignment in Bicep
@@ -252,9 +255,9 @@ var tags = {
   'created-by': createdByTag
   'application-name': applicationName
   'environment-name': environmentName
-  'application-owner': applicationOwnerTag
-  'business-owner': businessOwnerTag
-  'cost-center': costCenterTag
+  // 'application-owner': applicationOwnerTag
+  // 'business-owner': businessOwnerTag
+  // 'cost-center': costCenterTag
 }
 
 // Run a script to dedupe the KeyVault secrets -- this fails on private networks right now so turn if off for them
@@ -368,6 +371,7 @@ module logAnalytics './modules/monitor/loganalytics.bicep' = {
     newLogAnalyticsName: resourceNames.outputs.logAnalyticsWorkspaceName
     newApplicationInsightsName: resourceNames.outputs.appInsightsName
     location: location
+    retentionInDays: logRetentionInDays
     tags: tags
   }
 }

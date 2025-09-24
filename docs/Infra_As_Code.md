@@ -88,7 +88,7 @@ Each Bicep file should follow this structure:
 2. **Parameters Section**:
    ```bicep
    param appName string
-   param environmentCode string = 'dev'
+   param environmentCode string = 'dv'
    param location string = resourceGroup().location
    ```
 
@@ -181,7 +181,7 @@ The infrastructure is designed to support multiple environments:
 Some resources are deployed conditionally based on the environment:
 
 ```bicep
-var deployAdvancedMonitoring = environmentCode == 'prod' || environmentCode == 'stg'
+var deployAdvancedMonitoring = environmentCode == 'pd' || environmentCode == 'ts'
 ```
 
 ## Best Practices
@@ -225,7 +225,7 @@ var deployAdvancedMonitoring = environmentCode == 'prod' || environmentCode == '
 // -----------------------------------------------
 param webSiteName string
 param location string = resourceGroup().location
-param environmentCode string = 'dev'
+param environmentCode string = 'dv'
 param commonTags object = {}
 
 var templateTag = { TemplateFile: '~website.bicep' }

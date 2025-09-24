@@ -155,6 +155,9 @@ param regionCode string = 'US'
 @description('Instance number for the application, e.g. 001, 002, etc. This is used to differentiate multiple instances of the same application in the same environment.')
 param instanceNumber string = '001' // used to differentiate multiple instances of the same application in the same environment
 
+@description('Number of days to retain logs in Log Analytics workspace')
+param logRetentionInDays int = 365
+
 // --------------------------------------------------------------------------------------------------------------
 // Additional Tags that may be included or not
 // --------------------------------------------------------------------------------------------------------------
@@ -237,6 +240,7 @@ module logAnalytics './modules/monitor/loganalytics.bicep' = {
     newLogAnalyticsName: resourceNames.outputs.logAnalyticsWorkspaceName
     newApplicationInsightsName: resourceNames.outputs.appInsightsName
     location: location
+    retentionInDays: logRetentionInDays
     tags: tags
   }
 }

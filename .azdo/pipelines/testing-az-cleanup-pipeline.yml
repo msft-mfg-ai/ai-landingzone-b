@@ -13,21 +13,23 @@ parameters:
     displayName: Run commands in
     type: string
     values:
-      - DEV
-      - QA
+      - DV
+      - TS
 
 # ----------------------------------------------------------------------------------------------------
 variables:
   - group: AI.LZ.Secrets
   - template: vars/var-service-connections.yml
   - name: resourceGroupName
-    value: rg-ai-docs-dev
+    value: rg-ai-docs-de
 
   # Bring in environment specific variable files
-  - ${{ if eq(lower(parameters.runEnvironment), 'dev') }}:
-      - template: vars/var-dev.yml
-  - ${{ if eq(lower(parameters.runEnvironment), 'qa') }}:
-      - template: vars/var-qa.yml
+  - ${{ if eq(lower(parameters.runEnvironment), 'dv') }}:
+      - template: vars/var-dv.yml
+  - ${{ if eq(lower(parameters.runEnvironment), 'ts') }}:
+      - template: vars/var-ts.yml
+  - ${{ if eq(lower(parameters.runEnvironment), 'pd') }}:
+      - template: vars/var-pd.yml
 
 jobs:
 - job: CleanupJob

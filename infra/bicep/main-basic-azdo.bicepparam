@@ -4,15 +4,11 @@
 // Anything that starts with a # and a { is a variable that will be replaced at runtime.
 // --------------------------------------------------------------------------------
 // The following values should be defined in Azure Library Variables:
-//   APP_NAME='myailz' `
-//   RESOURCEGROUP_PREFIX ='rg-ailz' `
-//   COST_CENTER          ='9999999' `
-//   APPLICATION_OWNER    ='SomeAppOwner' `
-//   BUSINESS_OWNER       ='SomeBusOwner' `
-//   CREATED_BY           ='SomeCreator' `
-//   OWNER_EMAIL          ='applicationowner@company.com' `
-//   MY_IP_ADDRESS        ='<yourPublicIpAddress>' `
-//   USER_PRINCIPAL_ID    ='<yourAdminPrincipalId>'
+//   APP_NAME             = '<yourAppName>'
+//   RESOURCEGROUP_PREFIX = 'rg-ailz'
+//   INSTANCE_NUMBER      = '001'
+//   MY_IP_ADDRESS        = '<yourPublicIAddress>'
+//   USER_PRINCIPAL_ID    = '<yourAdminPrincipalId>'
 //   ENVIRONMENT_CODE     = Runtime  - Environment Code (e.g., dev, qa, prod)
 // --------------------------------------------------------------------------------
 
@@ -24,9 +20,11 @@ param principalId = '#{USER_PRINCIPAL_ID}#'
 param instanceNumber = '#{INSTANCE_NUMBER}#'
 param regionCode = '#{GLOBAL_REGION_CODE}#' 
 
-param businessOwnerTag  = '#{BUSINESS_OWNER}#'
-param applicationOwnerTag  = '#{APPLICATION_OWNER}#'
-param costCenterTag  = '#{COST_CENTER}#'
+param logRetentionInDays = empty('#{LOG_RETENTION_DAYS}#') ? 365 : int('#{LOG_RETENTION_DAYS}#')
+
+// param businessOwnerTag  = '#{BUSINESS_OWNER}#'
+// param applicationOwnerTag  = '#{APPLICATION_OWNER}#'
+// param costCenterTag  = '#{COST_CENTER}#'
 
 param gpt40_DeploymentCapacity = empty('#{AI_MODEL_CAPACITY}#') ? null : int('#{AI_MODEL_CAPACITY}#')
 param gpt41_DeploymentCapacity = empty('#{AI_MODEL_CAPACITY}#') ? null : int('#{AI_MODEL_CAPACITY}#')

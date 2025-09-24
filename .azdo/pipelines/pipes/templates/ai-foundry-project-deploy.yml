@@ -7,7 +7,7 @@
 # ----------------------------------------------------------------------------------------------------
 parameters:
   - name: environmentCode
-    default: 'DEV'
+    default: 'DV'
   - name: templateFolderName
     default: 'infra/bicep'
   - name: templateFileName
@@ -46,12 +46,12 @@ jobs:
       - template: ../../vars/var-source-location-app.yml
 
       # Bring in environment specific variable files
-      - ${{ if eq(lower(parameters.environmentcode), 'dev') }}:
-          - template: ../../vars/var-dev.yml
-      - ${{ if eq(lower(parameters.environmentcode), 'qa') }}:
-          - template: ../../vars/var-qa.yml
-      - ${{ if eq(lower(parameters.environmentcode), 'prod') }}:
-          - template: ../../vars/var-prod.yml
+      - ${{ if eq(lower(parameters.environmentcode), 'dv') }}:
+          - template: ../../vars/var-dv.yml
+      - ${{ if eq(lower(parameters.environmentcode), 'ts') }}:
+          - template: ../../vars/var-ts.yml
+      - ${{ if eq(lower(parameters.environmentcode), 'pd') }}:
+          - template: ../../vars/var-pd.yml
 
     steps:
       - bash: |
@@ -125,26 +125,26 @@ jobs:
       # in order to use multiple dynamic service connections, you can't just use a variable.
       # they need to be defined and available at YML pre-compile time, so use this technique.
       # this switch allows you to dynamically select a 'hard-coded' service connection
-      - ${{ if eq(variables.environmentcodeUpper, 'DEV') }}:
+      - ${{ if eq(variables.environmentcodeUpper, 'DV') }}:
           - template: steps-deploy-bicep-template.yml
             parameters:
-              serviceConnectionName: $(serviceConnectionDEV)
+              serviceConnectionName: $(serviceConnectionDV)
               createResourceGroup: ${{ parameters.createResourceGroup }}
               deployToResourceGroup: ${{ parameters.deployToResourceGroup }}
               resourceGroupName: $(resourceGroupName)
               parseBicepOutputs: true
-      - ${{ if eq(variables.environmentcodeUpper, 'QA') }}:
+      - ${{ if eq(variables.environmentcodeUpper, 'TS') }}:
           - template: steps-deploy-bicep-template.yml
             parameters:
-              serviceConnectionName: $(serviceConnectionQA)
+              serviceConnectionName: $(serviceConnectionTS)
               createResourceGroup: ${{ parameters.createResourceGroup }}
               deployToResourceGroup: ${{ parameters.deployToResourceGroup }}
               resourceGroupName: $(resourceGroupName)
               parseBicepOutputs: true
-      - ${{ if eq(variables.environmentcodeUpper, 'PROD') }}:
+      - ${{ if eq(variables.environmentcodeUpper, 'PD') }}:
           - template: steps-deploy-bicep-template.yml
             parameters:
-              serviceConnectionName: $(serviceConnectionPROD)
+              serviceConnectionName: $(serviceConnectionPD)
               createResourceGroup: ${{ parameters.createResourceGroup }}
               deployToResourceGroup: ${{ parameters.deployToResourceGroup }}
               resourceGroupName: $(resourceGroupName)
@@ -172,31 +172,31 @@ jobs:
       # in order to use multiple dynamic service connections, you can't just use a variable.
       # they need to be defined and available at YML pre-compile time, so use this technique.
       # this switch allows you to dynamically select a 'hard-coded' service connection
-      - ${{ if eq(variables.environmentcodeUpper, 'DEV') }}:
+      - ${{ if eq(variables.environmentcodeUpper, 'DV') }}:
         - task: AzureCLI@2
           displayName: Deploy AI Foundry Hub Project
           inputs:
-            AzureSubscription: $(serviceConnectionDEV)
+            AzureSubscription: $(serviceConnectionDV)
             scriptType: bash
             scriptLocation: inlineScript
             inlineScript: |
               az ml workspace create --kind project --resource-group $(resourceGroupName) --hub-id $(bicepOutputs-AI_HUB_ID) --name $(bicepOutputs-AI_PROJECT_NAME)
 
-      - ${{ if eq(variables.environmentcodeUpper, 'QA') }}:
+      - ${{ if eq(variables.environmentcodeUpper, 'TS') }}:
         - task: AzureCLI@2
           displayName: Deploy AI Foundry Hub Project
           inputs:
-            AzureSubscription: $(serviceConnectionQA)
+            AzureSubscription: $(serviceConnectionTS)
             scriptType: bash
             scriptLocation: inlineScript
             inlineScript: |
               az ml workspace create --kind project --resource-group $(resourceGroupName) --hub-id $(bicepOutputs-AI_HUB_ID) --name $(bicepOutputs-AI_PROJECT_NAME)
 
-      - ${{ if eq(variables.environmentcodeUpper, 'PROD') }}:
+      - ${{ if eq(variables.environmentcodeUpper, 'PD') }}:
         - task: AzureCLI@2
           displayName: Deploy AI Foundry Hub Project
           inputs:
-            AzureSubscription: $(serviceConnectionPROD)
+            AzureSubscription: $(serviceConnectionPD)
             scriptType: bash
             scriptLocation: inlineScript
             inlineScript: |

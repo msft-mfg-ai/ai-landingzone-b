@@ -14,6 +14,8 @@ param privateEndpointName string = ''
 param publicNetworkAccessForIngestion string = 'Enabled'
 param publicNetworkAccessForQuery string = 'Enabled'
 
+param retentionInDays int = 30
+
 var useExistingLogAnalytics = !empty(existingLogAnalyticsName)
 var useExistingAppInsights = !empty(existingApplicationInsightsName)
 
@@ -27,7 +29,7 @@ resource newLogAnalyticsResource 'Microsoft.OperationalInsights/workspaces@2023-
   location: location
   tags: tags
   properties: any({
-    retentionInDays: 30
+    retentionInDays: retentionInDays
     features: {
       searchVersion: 1
     }

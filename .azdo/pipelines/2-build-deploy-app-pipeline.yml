@@ -13,11 +13,11 @@ parameters:
   displayName: Deploy To
   type: string
   values:
-    - DEV
-    - QA
-    - PROD
-    - DEV-QA-PROD
-  default: DEV
+    - DV
+    - TS
+    - PD
+    - DV-TS-PD
+  default: DV
 - name: buildApps
   displayName: Build Docker Images
   type: boolean
@@ -56,11 +56,11 @@ stages:
       jobs:
         - template: pipes/templates/scan-code-template.yml
           parameters:
-            environmentName: 'DEV'
+            environmentName: 'DV'
             runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
             runGHASScan: false
 
-- ${{ if ne(parameters.deployToEnvironment, 'DEV-QA-PROD') }}:
+- ${{ if ne(parameters.deployToEnvironment, 'DV-TS-PD') }}:
   - template: pipes/build-deploy-app-pipe.yml
     parameters:
       environments: ['${{ parameters.deployToEnvironment }}']
@@ -72,10 +72,10 @@ stages:
         { containerAppName: 'ui',  acrAppName: 'chatui',  projectFolderName: 'src/website/chatui', port: '8080' }
       ] 
 
-- ${{ if eq(parameters.deployToEnvironment, 'DEV-QA-PROD') }}:
+- ${{ if eq(parameters.deployToEnvironment, 'DV-TS-PD') }}:
   - template: pipes/build-deploy-app-pipe.yml
     parameters:
-      environments: ['DEV', 'QA', 'PROD']
+      environments: ['DV', 'TS', 'PD']
       pushToACR: ${{ parameters.pushApps }}
       deployAction: ${{ parameters.deployAction }}
       updateACRFirewall: ${{ parameters.updateACRFirewall }}

@@ -286,12 +286,12 @@ on:
       environmentName:
         description: 'Target Environment'
         required: true
-        default: 'dev'
+        default: 'dv'
         type: choice
         options:
-          - dev
-          - qa
-          - prod
+          - dv
+          - ts
+          - pd
 
 jobs:
   deploy-infra:
@@ -317,7 +317,7 @@ on:
       environmentName:
         description: 'Target Environment'
         required: true
-        default: 'dev'
+        default: 'dv'
 
 jobs:
   security-scan:
@@ -330,14 +330,14 @@ jobs:
     needs: security-scan
     uses: ./.github/workflows/template-create-infra.yml
     with:
-      envCode: ${{ inputs.environmentName || 'dev' }}
+      envCode: ${{ inputs.environmentName || 'dv' }}
     secrets: inherit
 
   build-application:
     needs: deploy-infrastructure
     uses: ./.github/workflows/template-webapp-build.yml
     with:
-      envCode: ${{ inputs.environmentName || 'dev' }}
+      envCode: ${{ inputs.environmentName || 'dv' }}
       rootDirectory: 'src/Application'
       projectName: 'Application.Web'
     secrets: inherit
@@ -346,14 +346,14 @@ jobs:
     needs: build-application
     uses: ./.github/workflows/template-webapp-deploy.yml
     with:
-      envCode: ${{ inputs.environmentName || 'dev' }}
+      envCode: ${{ inputs.environmentName || 'dv' }}
     secrets: inherit
 
   smoke-test:
     needs: deploy-application
     uses: ./.github/workflows/template-smoke-test.yml
     with:
-      envCode: ${{ inputs.environmentName || 'dev' }}
+      envCode: ${{ inputs.environmentName || 'dv' }}
     secrets: inherit
 ```
 

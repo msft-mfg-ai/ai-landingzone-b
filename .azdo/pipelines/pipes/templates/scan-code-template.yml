@@ -10,7 +10,7 @@
 # ----------------------------------------------------------------------------------------------------
 parameters:
   - name: environmentCode
-    default: 'DEV'
+    default: 'DV'
   - name: runGHASScan
     default: 'false'
   - name: runMSDevSecOpsScan
@@ -47,12 +47,12 @@ jobs:
           - ${{ if eq(lower(parameters.codeSection), 'console') }}:
               - template: ../../vars/var-source-location-console.yml
           # Bring in environment specific variable files
-          - ${{ if eq(lower(parameters.environmentCode), 'dev') }}:
-              - template: ../../vars/var-dev.yml
-          - ${{ if eq(lower(parameters.environmentCode), 'qa') }}:
-              - template: ../../vars/var-qa.yml
-          - ${{ if eq(lower(parameters.environmentCode), 'prod') }}:
-              - template: ../../vars/var-prod.yml
+          - ${{ if eq(lower(parameters.environmentCode), 'dv') }}:
+              - template: ../../vars/var-dv.yml
+          - ${{ if eq(lower(parameters.environmentCode), 'ts') }}:
+              - template: ../../vars/var-ts.yml
+          - ${{ if eq(lower(parameters.environmentCode), 'pd') }}:
+              - template: ../../vars/var-pd.yml
         steps:
           # Very basic simple example that might work sometimes...
           # - task: AdvancedSecurity-Codeql-Init@1
@@ -159,12 +159,12 @@ jobs:
           - ${{ if eq(lower(parameters.codeSection), 'console') }}:
               - template: ../../vars/var-source-location-console.yml
           # Bring in environment specific variable files
-          - ${{ if eq(lower(parameters.environmentCode), 'dev') }}:
-              - template: ../../vars/var-dev.yml
-          - ${{ if eq(lower(parameters.environmentCode), 'qa') }}:
-              - template: ../../vars/var-qa.yml
-          - ${{ if eq(lower(parameters.environmentCode), 'prod') }}:
-              - template: ../../vars/var-prod.yml
+          - ${{ if eq(lower(parameters.environmentCode), 'dv') }}:
+              - template: ../../vars/var-dv.yml
+          - ${{ if eq(lower(parameters.environmentCode), 'ts') }}:
+              - template: ../../vars/var-ts.yml
+          - ${{ if eq(lower(parameters.environmentCode), 'pd') }}:
+              - template: ../../vars/var-pd.yml
         steps:
           - bash: |
               echo "parameters.runMSDevSecOpsScan=${{parameters.runMSDevSecOpsScan}}"

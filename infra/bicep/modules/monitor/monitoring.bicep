@@ -3,13 +3,14 @@ param applicationInsightsName string
 param location string = resourceGroup().location
 param tags object = {}
 
+param retentionInDays int = 30
 
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   name: logAnalyticsName
   location: location
   tags: tags
   properties: any({
-    retentionInDays: 30
+    retentionInDays: retentionInDays
     features: {
       searchVersion: 1
     }
