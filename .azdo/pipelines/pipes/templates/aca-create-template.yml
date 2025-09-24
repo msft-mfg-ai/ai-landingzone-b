@@ -1,0 +1,134 @@
+# ----------------------------------------------------------------------------------------------------
+# Template to create a Container App and deploy a Docker image to it
+# ----------------------------------------------------------------------------------------------------
+# This template gets the appName from the variable group: AI.LZ.Secrets
+#   and the resource group name from /vars/var-<env>.yml
+# ----------------------------------------------------------------------------------------------------
+parameters:
+  - name: serviceConnectionName
+    type: string
+  - name: environmentCode
+    default: 'DEV'
+    type: string
+  - name: containerAppName
+    default: ''
+    type: string
+  - name: acrAppName
+    default: ''
+    type: string
+  - name: port
+    default: '8080'
+    type: string
+  - name: acrFolderName
+    default: 'appImages'
+    type: string
+
+# ----------------------------------------------------------------------------------------------------
+jobs:
+  - deployment: InitDeploy${{ parameters.containerAppName }}${{ parameters.environmentcode }}
+    displayName: Init Deploy ${{ parameters.containerAppName }} ${{ parameters.environmentcode }}
+    environment: ${{ parameters.environmentcode }}
+
+  - job: DeployApp${{ parameters.containerAppName }}${{ parameters.environmentcode }}Job
+    displayName: Deploy ${{ parameters.containerAppName }} ${{ parameters.environmentcode }}
+    variables:
+      - group: AI.LZ.Secrets # need to get the appName from here
+      # Bring in environment specific variable files
+      - ${{ if eq(lower(parameters.environmentcode), 'dev') }}:
+          - template: ../../vars/var-dev.yml
+      - ${{ if eq(lower(parameters.environmentcode), 'qa') }}:
+          - template: ../../vars/var-qa.yml
+      - ${{ if eq(lower(parameters.environmentcode), 'prod') }}:
+          - template: ../../vars/var-prod.yml
+
+    steps:
+      # ----------------------------------------------------------------------------------------------------
+      # Set up the environment variables
+      # ----------------------------------------------------------------------------------------------------
+      - task: PowerShell@2
+        name: createVariables
+        displayName: Create Variables
+        continueOnError: true
+        inputs:
+          targetType: 'inline'
+          script: |
+            $appNameNoDashesLower="$(APP_NAME)".ToLower().Replace("-", "")
+            $environmentCodeLower="${{ parameters.environmentcode }}".ToLower()
+            $containerAppNameLower="${{ parameters.containerAppName }}".ToLower()
+            $acrFolderNameLower="${{ parameters.acrFolderName }}".ToLower()
+            $acrAppNameLower="${{ parameters.acrAppName }}".ToLower()
+
+            $resourceGroupName="$(RESOURCEGROUP_PREFIX)-$environmentCodeLower-$(INSTANCE_NUMBER)".ToLower()
+            echo "##vso[task.setvariable variable=resourceGroupName]$resourceGroupName"
+
+            $caAppName="ca-ui-$($appNameNoDashesLower)-$($environmentCodeLower)-$(INSTANCE_NUMBER)"
+            echo "##vso[task.setvariable variable=caAppName]$caAppName"
+            $imageName="$($acrFolderNameLower)/$($acrAppNameLower):$(Build.BuildId)"
+            echo "##vso[task.setvariable variable=imageName]$imageName"
+            $acrName="cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER)"
+            echo "##vso[task.setvariable variable=acrName]$acrName"
+            $containerRegistryUrl="cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER).azurecr.io"
+            echo "##vso[task.setvariable variable=containerRegistryUrl]$containerRegistryUrl"
+
+            $keyVaultName="kv$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER)"
+            echo "##vso[task.setvariable variable=keyVaultName]$keyVaultName"
+            $userAssignedIdentityId="id-$($appNameNoDashesLower)-$($environmentCodeLower)-$(INSTANCE_NUMBER)"
+            echo "##vso[task.setvariable variable=userAssignedIdentityId]$userAssignedIdentityId"
+            $containerAppEnvName="cae-$($appNameNoDashesLower)-$($environmentCodeLower)-$(INSTANCE_NUMBER)"
+            echo "##vso[task.setvariable variable=containerAppEnvName]$containerAppEnvName"
+
+            echo "environmentCodeLower=$environmentCodeLower"
+            echo "appNameNoDashesLower=$appNameNoDashesLower"
+            echo "resourceGroupName=$resourceGroupName"
+            echo "containerAppNameLower=$containerAppNameLower"
+            echo "acrFolderNameLower=$acrFolderNameLower"
+            echo "acrAppNameLower=$acrAppNameLower"
+            echo "caAppName=$caAppName"
+            echo "containerRegistryUrl=$containerRegistryUrl"
+            echo "imageName=$imageName"
+            echo "acrName=$acrName"
+            echo "keyVaultName=$keyVaultName"
+            echo "containerRegistryUrl=$containerRegistryUrl"
+            echo "userAssignedIdentityId=$userAssignedIdentityId"
+            echo "containerAppEnvName=$containerAppEnvName"
+
+            echo "----------------------------------------"
+            echo "##[group]Display All Environment Variables:"
+            printenv | sort
+            echo "##[endgroup]"
+
+      # ----------------------------------------------------------------------------------------------------
+      # Deploy the container app image
+      # ----------------------------------------------------------------------------------------------------
+      - task: AzureCLI@2
+        displayName: Deploy Container App
+        inputs:
+          AzureSubscription: $(serviceConnectionName)
+          scriptType: bash
+          scriptLocation: inlineScript
+          inlineScript: |
+            echo "Deploying Container App: $(caAppName) to Resource Group: $(resourceGroupName) in Environment: $(containerAppEnvName)"
+            echo 'EXECUTING: az containerapp create --name $(caAppName) --resource-group $(resourceGroupName) --environment $(containerAppEnvName) --image $(containerRegistryUrl)/$(imageName) --target-port ${{ parameters.port }} --env-vars AppAgentEndpoint="$(APP_AGENT_ENDPOINT)" AppAgentId="$(APP_AGENT_ID)" APPLICATIONINSIGHTS_CONNECTION_STRING="$(appInsightsConnectionString)" AZURE_CLIENT_ID="$userAssignedIdentityId" ... --user-assigned "$userAssignedIdentityId" --registry-server "$(acrName).azurecr.io" ... '
+            az containerapp create \
+              --name $(caAppName) \
+              --resource-group $(resourceGroupName) \
+              --environment $(containerAppEnvName) \
+              --image $(containerRegistryUrl)/$(imageName) \
+              --target-port ${{ parameters.port }} \
+              --env-vars \
+                AppSettings__AppAgentEndpoint="$(APP_AGENT_ENDPOINT)" \
+                AppSettings__AppAgentId="$(APP_AGENT_ID)" \
+                APPLICATIONINSIGHTS_CONNECTION_STRING="$(APPINSIGHTS_CONNECTIONSTRING)" \
+                AZURE_CLIENT_ID="$(userAssignedIdentityId)" \
+                AZURE_SDK_TRACING_IMPLEMENTATION="opentelemetry" \
+                AZURE_TRACING_GEN_AI_CONTENT_RECORDING_ENABLED="true" \
+                SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS="true" \
+                SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS_SENSITIVE="true" \
+              --user-assigned "$(userAssignedIdentityId)" \
+              --registry-server "$(acrName).azurecr.io" \
+              --cpu 0.5 \
+              --memory 1.0 \
+              --min-replicas 1 \
+              --max-replicas 1 \
+              --ingress external \
+              --container-name app

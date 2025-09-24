@@ -1,0 +1,89 @@
+# ------------------------------------------------------------------------------------------------------------------------
+# Pipeline to deploy Azure Resources Only
+# See readme file for info about the contents of the variable group
+# ------------------------------------------------------------------------------------------------------------------------
+name: $(date:yyyy).$(date:MM).$(date:dd)$(rev:.r)
+pool:
+  vmImage: ubuntu-latest
+
+# ------------------------------------------------------------------------------------------------------------------------
+trigger:
+  # since this repo has both AzDO and GHA pipelines, nothing is run automatically...
+  - none
+  # batch: true
+  # branches:
+  #   include:
+  #     - main
+  # paths:
+  #   include:
+  #     - '**/*.yml'
+  #     - '**/*.yaml'
+  #     - '**/*.bicep'
+
+# ----------------------------------------------------------------------------------------------------
+parameters:
+  - name: deployToEnvironment
+    displayName: Deploy To
+    type: string
+    values:
+      - DEV
+      - QA
+      - PROD
+      - DEV-QA-PROD
+    default: DEV
+  - name: deploymentMode
+    displayName: Deploy Mode
+    type: string
+    values:
+      - Incremental
+      - Validation
+      - Complete
+    default: Incremental
+  - name: createResourceGroup
+    displayName: Create Resource Group?
+    type: boolean
+    default: true
+  - name: projectName
+    displayName: Project Name (change x to match Project Number)
+    type: string
+    default: 'aiprojX'
+  - name: projectNumber
+    displayName: Project Number
+    type: string
+    default: '00X'
+  - name: runMSDevSecOpsScan
+    displayName: Run MS DevSecOps Scan?
+    type: boolean
+    default: false
+
+# ----------------------------------------------------------------------------------------------------
+variables:
+  - group: AI.LZ.Secrets
+  - template: vars/var-service-connections.yml
+
+# ----------------------------------------------------------------------------------------------------
+stages:
+  - ${{ if ne(parameters.deployToEnvironment, 'DEV-QA-PROD') }}:
+      - template: pipes/infra-only-pipe.yml
+        parameters:
+          environments: ['${{ parameters.deployToEnvironment }}']
+          bicepVersion: 'project'
+          projectName: ${{ parameters.projectName }}
+          projectNumber: ${{ parameters.projectNumber }}
+          singleEnvironment: 'true'
+          createResourceGroup: ${{ parameters.createResourceGroup }}
+          appsToDeploy: 'none'
+          addRoleAssignments: 'true'
+          runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
+
+  - ${{ if eq(parameters.deployToEnvironment, 'DEV-QA-PROD') }}:
+      - template: pipes/infra-only-pipe.yml
+        parameters:
+          environments: ['DEV', 'QA', 'PROD']
+          bicepVersion: 'project'
+          projectName: ${{ parameters.projectName }}
+          projectNumber: ${{ parameters.projectNumber }}
+          createResourceGroup: ${{ parameters.createResourceGroup }}
+          appsToDeploy: 'none'
+          addRoleAssignments: 'true'
+          runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}

@@ -1,0 +1,107 @@
+# ------------------------------------------------------------------------------------------------------------------------
+# Reusable Workflow: Create a Container App
+# ------------------------------------------------------------------------------------------------------------------------
+name: z_template_create_container_app
+run-name: Create Container App
+on:
+  workflow_call:
+    inputs:
+      ENV_CODE:
+        required: true
+        type: string
+      ACR_NAME:
+        required: true
+        type: string
+      RESOURCE_GROUP:
+        required: true
+        type: string
+      CONTAINER_APP_ENV_NAME:
+        required: true
+        type: string
+      CONTAINER_NAME:
+        required: true
+        type: string
+      IMAGE_NAME:
+        required: true
+        type: string
+      PORT:
+        required: true
+        type: string
+      USER_ASSIGNED_IDENTITY_ID:
+        required: true
+        type: string
+      KEY_VAULT_NAME:
+        required: true
+        type: string
+
+# ------------------------------------------------------------------------------------------------------------------------
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.ENV_CODE }}
+    steps:
+      - name: Display Variables and Files
+        run: |-
+          echo "inputs.ENV_CODE=${{ inputs.ENV_CODE }}"
+          echo "inputs.KEY_VAULT_NAME=${{ inputs.KEY_VAULT_NAME }}"
+          echo "inputs.ACR_NAME=${{ inputs.ACR_NAME }}"
+          echo "inputs.CONTAINER_APP_ENV_NAME=${{ inputs.CONTAINER_APP_ENV_NAME }}"
+          echo "inputs.CONTAINER_NAME=${{ inputs.CONTAINER_NAME }}"
+          echo "inputs.RESOURCE_GROUP=${{ inputs.RESOURCE_GROUP }}"
+          echo "inputs.IMAGE_NAME=${{ inputs.IMAGE_NAME }}"
+          echo "inputs.PORT=${{ inputs.PORT }}"
+
+          echo "---------------------------------"
+          echo "##[group]All Variables:"
+          echo "Environment:"
+          echo '${{ toJSON(env) }}'
+          echo "Variables:"
+          echo '${{ toJSON(vars) }}'
+          echo "Secrets:"
+          echo '${{ toJSON(secrets) }}'
+          echo "Inputs:"
+          echo '${{ toJSON(inputs) }}'
+          echo "##[endgroup]"
+        continue-on-error: true
+
+      - uses: actions/checkout@v4
+
+      - name: Azure Login (Reusable Action)
+        uses: ./.github/actions/login-action
+        with:
+          client-id: ${{ secrets.CICD_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          # client-secret: ${{ secrets.CICD_CLIENT_SECRET }}
+
+      - name: Create UI Container App
+        run: |
+          echo "Creating UI Container App..."
+          echo 'EXECUTING: az containerapp create --name ${{ inputs.CONTAINER_NAME }} --resource-group ${{ inputs.RESOURCE_GROUP }} --environment ${{ inputs.CONTAINER_APP_ENV_NAME }} --image ${{ inputs.ACR_NAME }}.azurecr.io/${{ inputs.IMAGE_NAME }} --target-port ${{ inputs.PORT }} --env-vars AppAgentEndpoint="${{ vars.APP_AGENT_ENDPOINT }}" AppAgentId="${{ vars.APP_AGENT_ID }}" APPLICATIONINSIGHTS_CONNECTION_STRING="${{ vars.APPINSIGHTS_CONNECTIONSTRING }}" AZURE_CLIENT_ID="${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" ...  --user-assigned "${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" --registry-server "${{ inputs.ACR_NAME }}.azurecr.io" ...'
+          az containerapp create \
+            --name ${{ inputs.CONTAINER_NAME }} \
+            --resource-group ${{ inputs.RESOURCE_GROUP }} \
+            --environment ${{ inputs.CONTAINER_APP_ENV_NAME }} \
+            --image ${{ inputs.ACR_NAME }}.azurecr.io/${{ inputs.IMAGE_NAME }} \
+            --target-port ${{ inputs.PORT }} \
+            --env-vars \
+              AppSettings__AppAgentEndpoint="${{ vars.APP_AGENT_ENDPOINT }}" \
+              AppSettings__AppAgentId="${{ vars.APP_AGENT_ID }}" \
+              APPLICATIONINSIGHTS_CONNECTION_STRING="${{ vars.APPINSIGHTS_CONNECTIONSTRING }}" \
+              AZURE_CLIENT_ID="${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" \
+              AZURE_SDK_TRACING_IMPLEMENTATION="opentelemetry" \
+              AZURE_TRACING_GEN_AI_CONTENT_RECORDING_ENABLED="true" \
+              SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS="true" \
+              SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS_SENSITIVE="true" \
+            --cpu 0.5 \
+            --memory 1.0 \
+            --min-replicas 1 \
+            --max-replicas 1 \
+            --ingress external \
+            --user-assigned "${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" \
+            --registry-server "${{ inputs.ACR_NAME }}.azurecr.io" \
+            --container-name app
+
+# Put this right above the "--env-vars" line if needed
+# --secrets entraclientid="$ { { secrets.ENTRA_CLIENT_ID }}" entraclientsecret="$ { { secrets.ENTRA_CLIENT_SECRET }}" \

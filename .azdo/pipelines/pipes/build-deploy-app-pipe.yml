@@ -1,0 +1,62 @@
+# ----------------------------------------------------------------------------------------------------
+# Pipe to build an Azure Container App for multiple apps and environments
+# ----------------------------------------------------------------------------------------------------
+parameters:
+  - name: environments
+    type: object
+    default: ['DEV']
+  - name: singleEnvironment
+    default: 'false'
+  - name: apps
+    type: object
+    default: []
+  - name: pushToACR
+    default: true
+    type: boolean
+  - name: deployAction
+    default: 'build-deploy'  # Options: 'build-deploy', 'create-build-deploy', 'none'
+  - name: updateACRFirewall
+    default: false
+
+# ----------------------------------------------------------------------------------------------------
+stages:
+- ${{ each environmentCode in parameters.environments }}:
+  - ${{ each app in parameters.apps }}:
+    - stage: Build${{ app.containerAppName }}${{ environmentCode }}
+      displayName: Build ${{ app.containerAppName }} ${{ environmentCode }}
+      condition: or(eq(${{ parameters.singleEnvironment }}, 'true'), eq(upper('${{ environmentCode }}'), 'DEV'), and(eq(upper('${{ environmentCode }}'), 'QA'), succeeded('Deploy${{ app.containerAppName }}Dev')), and(eq(upper('${{ environmentCode }}'), 'PROD'), succeeded('Deploy${{ app.containerAppName }}QA')))
+      jobs:
+        - template: templates/aca-build-template.yml
+          parameters:
+            serviceConnectionName: $(serviceConnectionName)
+            environmentCode: ${{ environmentCode }}
+            acrAppName: ${{ app.acrAppName }}
+            projectFolderName: ${{ app.projectFolderName }}
+            pushToACR: ${{ parameters.pushToACR }}
+            updateFirewall: ${{ parameters.updateACRFirewall }}
+
+    - stage: Deploy${{ app.containerAppName }}${{ environmentCode }}
+      displayName: Deploy ${{ app.containerAppName }} ${{ environmentCode }}
+      condition: and(succeeded(), eq(lower('${{ parameters.deployAction }}'), 'build-deploy'))
+      dependsOn: Build${{ app.containerAppName }}${{ environmentCode }}
+      jobs:
+        - template: templates/aca-deploy-template.yml
+          parameters:
+            serviceConnectionName: $(serviceConnectionName)
+            environmentCode: ${{ environmentCode }}
+            containerAppName: ${{ app.containerAppName }}
+            acrAppName: ${{ app.acrAppName }}
+            port: ${{ app.port }}
+  
+    - stage: Create${{ app.containerAppName }}${{ environmentCode }}
+      displayName: Create ${{ app.containerAppName }} ${{ environmentCode }}
+      condition: and(succeeded(), eq(lower('${{ parameters.deployAction }}'), 'create-build-deploy'))
+      dependsOn: Build${{ app.containerAppName }}${{ environmentCode }}
+      jobs:
+        - template: templates/aca-create-template.yml
+          parameters:
+            serviceConnectionName: $(serviceConnectionName)
+            environmentCode: ${{ environmentCode }}
+            containerAppName: ${{ app.containerAppName }}
+            acrAppName: ${{ app.acrAppName }}
+            port: ${{ app.port }}

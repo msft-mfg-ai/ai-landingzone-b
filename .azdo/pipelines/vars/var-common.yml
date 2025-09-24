@@ -1,0 +1,44 @@
+# ----------------------------------------------------------------------------------------------------
+# Variables common to all environments
+# ----------------------------------------------------------------------------------------------------
+variables:
+  # - name: appName   (moved to variable group, or you can put it here if you prefer)
+  #   value: 'this is unique to you - define in a variable group or on the pipeline variables!'
+  # - name: resourceGroupPrefix   (moved to variable group, or you can put it here if you prefer)
+  #   value: 'this is unique to your subscription - define in a variable group or on the pipeline variables!'
+  # - name: INSTANCE_NUMBER
+  #   value: '001'
+
+  - name: GLOBAL_REGION_CODE
+    value: 'US'
+
+  - name: workingDirectoryInfra
+    value: '/infra/bicep'
+  - name: workingDirectoryIgnore
+    value: '/docs'
+
+  # # Not used at this time...
+  # - name: APIM_BASE_URL
+  #   value: ''
+  # - name: APIM_ACCESS_URL
+  #   value: ''
+  # - name: APIM_ACCESS_KEY
+  #   value: ''
+  # - name: ENTRA_TENANT_ID
+  #   value: ''
+  # - name: ENTRA_API_AUDIENCE
+  #   value: ''
+  # - name: ENTRA_SCOPES
+  #   value: ''
+  # - name: ENTRA_REDIRECT_URI
+  #   value: ''
+  # - name: ENTRA_CLIENT_ID
+  #   value: ''
+  # - name: ENTRA_CLIENT_SECRET
+  #   value: ''
+  # - name: deployAPIM
+  #   value: 'false'
+  # - name: UI_IMAGE_NAME
+  #   value: ''
+  # - name: MOCK_USER_UPN
+  #   value: ''

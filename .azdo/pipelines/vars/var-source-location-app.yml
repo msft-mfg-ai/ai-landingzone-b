@@ -1,0 +1,25 @@
+# ----------------------------------------------------------------------------------------------------
+# Variables for location of source for application and ACA configuration settings for each app
+# ----------------------------------------------------------------------------------------------------
+variables:
+  - name: ACR_REPO_NAME
+    value: 'ailzflows'
+
+  - name: UI_CONTAINER_APP_NAME
+    value: 'ui'
+  - name: UI_PROJECT_FOLDER_NAME
+    value: 'src/website/chatui'
+  - name: UI_ACR_APP_NAME
+    value: 'chatui'
+  - name: UI_PORT
+    value: '8080'
+
+  - name: API_CONTAINER_APP_NAME
+    value: 'api'
+  - name: API_PROJECT_FOLDER_NAME
+    value: 'src/api/chatapi'
+  - name: API_ACR_APP_NAME
+    value: 'chatapi'
+  - name: API_PORT
+    value: '8080'
+

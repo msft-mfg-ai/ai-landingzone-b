@@ -1,0 +1,191 @@
+# ------------------------------------------------------------------------------------------------------------------------
+# Action: Build and deploy all container app modules
+# ----------------------------------------------------------------------------------------------------
+# Note: in order to do multiple CA build/deploys, you need to change FW and login ONCE, otherwise
+# it tends to have token refresh issues and fail on the second and third app
+# ------------------------------------------------------------------------------------------------------------------------
+name: 2 - Build and Deploy CA Apps
+run-name: 2 - Build and Deploy CA Apps to ENV ${{ inputs.deployEnvironment }} by @${{ github.actor }}
+
+on:
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - app/**
+  workflow_dispatch:
+    inputs:
+      deployEnvironment:
+        description: Environment
+        required: true
+        type: environment
+      deployAction:
+        description: Deployment Action
+        required: true
+        default: 'deploy'
+        type: choice
+        options:
+          - build-deploy
+          - create-build-deploy
+      runMSSecurityScan:
+        description: Run MS DevSecOps Security Scan
+        required: false
+        default: false
+        type: boolean
+      updateACRFirewall:
+        description: Update ACR Firewall
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  id-token: write
+  contents: write
+  actions: read
+  pages: write
+  security-events: write
+  checks: write
+  issues: read
+  pull-requests: read
+  packages: read
+
+
+# ------------------------------------------------------------------------------------------------------------------------
+env:
+  # these are defined by the project itself, so they can stay here...
+  ACR_REPO_NAME: 'aiapps'
+  UI_APP_PATH: 'src/website/chatui'
+  UI_ACR_APP_NAME: 'chatui'
+  UI_PORT: '8001'
+
+# ------------------------------------------------------------------------------------------------------------------------
+jobs:
+  template-env:
+    # You can't pass environment variables to templates, so put them in outputs here that you CAN pass
+    name: Template Env Variables
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.deployEnvironment }}
+    outputs:
+      PROJECT_ROOT: ${{ github.workspace }}
+      ENV_CODE: ${{ inputs.deployEnvironment }}
+      APP_NAME: ${{ vars.APP_NAME }}
+      APP_NAME_NO_DASHES: ${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}
+      RESOURCEGROUPNAME: ${{ steps.set-env.outputs.RESOURCEGROUPNAME }}
+      USER_ASSIGNED_IDENTITY_ID: 'id-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
+      KEY_VAULT_NAME: 'kv${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}${{ inputs.deployEnvironment }}${{ vars.INSTANCE_NUMBER }}'
+
+      ACR_NAME: 'cr${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}${{ inputs.deployEnvironment }}${{ vars.INSTANCE_NUMBER }}'
+      ACR_REPO_NAME: ${{ env.ACR_REPO_NAME }}
+      CONTAINER_APP_ENV_NAME: 'cae-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
+      UI_CONTAINER_APP_NAME: 'ca-ui-${{ steps.set-env.outputs.APP_NAME_NO_DASHES }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}'
+      UI_APP_PATH: ${{ env.UI_APP_PATH }}
+      UI_ACR_APP_NAME: ${{ env.UI_ACR_APP_NAME }}
+      UI_PORT: ${{ env.UI_PORT }}
+
+    steps:
+      - name: Set common environment variables
+        id: set-env
+        run: |
+          echo "PROJECT_ROOT: ${{ github.workspace }}"
+          echo "inputs.ENV_CODE: ${{ inputs.deployEnvironment }}"
+          echo "vars.APP_NAME: ${{ vars.APP_NAME }}"
+
+          APP_NAME_NO_DASHES="$(echo ${{ vars.APP_NAME }} | tr -d '-' | tr -d '_' | tr '[:upper:]' '[:lower:]')"
+          echo "APP_NAME_NO_DASHES=$APP_NAME_NO_DASHES"
+          echo "APP_NAME_NO_DASHES=$APP_NAME_NO_DASHES" >> $GITHUB_OUTPUT
+          
+          ENV_DASH_REGION_DASH_INSTANCE="$(echo "${{ inputs.deployEnvironment }}-${{ vars.GLOBAL_REGION_CODE }}-${{ vars.INSTANCE_NUMBER }}" | tr '[:upper:]' '[:lower:]')"
+          echo "ENV_DASH_REGION_DASH_INSTANCE=$ENV_DASH_REGION_DASH_INSTANCE"
+          echo "ENV_DASH_REGION_DASH_INSTANCE=$ENV_DASH_REGION_DASH_INSTANCE" >> $GITHUB_OUTPUT
+          
+          ENV_INITIAL="$(echo "${{ inputs.deployEnvironment }}" | cut -c1)"
+          echo "ENV_INITIAL=$ENV_INITIAL"
+          echo "ENV_INITIAL=$ENV_INITIAL" >> $GITHUB_OUTPUT
+
+          RESOURCEGROUPNAME="$(echo "${{ vars.RESOURCEGROUP_PREFIX }}-${{ inputs.deployEnvironment }}-${{ vars.INSTANCE_NUMBER }}" | tr '[:upper:]' '[:lower:]')"
+          echo "RESOURCEGROUPNAME=$RESOURCEGROUPNAME"
+          echo "RESOURCEGROUPNAME=$RESOURCEGROUPNAME" >> $GITHUB_OUTPUT
+
+          ACR_NAME="$(echo ${{ vars.ACR_NAME }} | tr '[:upper:]' '[:lower:]')"
+          echo "ACR_NAME=$ACR_NAME" >> $GITHUB_OUTPUT
+
+          CONTAINER_APP_ENV_NAME="$(echo ${{ vars.CONTAINER_APP_ENV_NAME }} | tr '[:upper:]' '[:lower:]')"
+          echo "CONTAINER_APP_ENV_NAME=$CONTAINER_APP_ENV_NAME" >> $GITHUB_OUTPUT
+
+          KEY_VAULT_NAME="$(echo ${{ vars.KEY_VAULT_NAME }} | tr '[:upper:]' '[:lower:]')"
+          echo "KEY_VAULT_NAME=$KEY_VAULT_NAME" >> $GITHUB_OUTPUT
+
+          echo "APP_NAME_NO_DASHES: $APP_NAME_NO_DASHES"
+          echo "RESOURCEGROUPNAME: $RESOURCEGROUPNAME"
+          echo "ENV_DASH_REGION_DASH_INSTANCE: $ENV_DASH_REGION_DASH_INSTANCE"
+          echo "ACR_NAME: $ACR_NAME"
+          echo "CONTAINER_APP_ENV_NAME: $CONTAINER_APP_ENV_NAME"
+
+          echo "UI_APP_PATH: ${{ env.UI_APP_PATH }}"
+          echo "UI_ACR_APP_NAME: ${{ env.UI_ACR_APP_NAME }}"
+          echo "UI_PORT: ${{ env.UI_PORT }}"
+
+  # ------------------------------------------------------------------------------------------------------------------------
+  scan-code:
+    name: Scan Source Code
+    uses: ./.github/workflows/template-scan-code.yml
+    if: inputs.runMSSecurityScan
+    secrets: inherit
+    with:
+      runMSDevSecOpsScan: ${{ inputs.runMSSecurityScan }}
+
+  # ------------------------------------------------------------------------------------------------------------------------
+  build-ui:
+    name: Build UI Image
+    uses: ./.github/workflows/template-aca-build.yml
+    needs:
+      - template-env
+    secrets: inherit
+    with:
+      ENV_CODE: ${{ needs.template-env.outputs.ENV_CODE }}
+      RESOURCE_GROUP: ${{ needs.template-env.outputs.RESOURCEGROUPNAME }}
+
+      ACR_NAME: ${{ needs.template-env.outputs.ACR_NAME }}
+      ACR_REPO_NAME: ${{ needs.template-env.outputs.ACR_REPO_NAME }}
+      ACR_FW_UPDATE: ${{ inputs.updateACRFirewall }}
+
+      APP_PATH: ${{ needs.template-env.outputs.UI_APP_PATH }}
+      ACR_APP_NAME: ${{ needs.template-env.outputs.UI_ACR_APP_NAME }}
+
+  # ------------------------------------------------------------------------------------------------------------------------
+  deploy-existing-ui:
+    name: Deploy UI to ${{ inputs.deployEnvironment }}
+    uses: ./.github/workflows/template-aca-deploy.yml
+    if: ${{ inputs.deployAction == 'build-deploy' }}
+    needs:
+      - build-ui
+      - template-env
+    secrets: inherit
+    with:
+      ENV_CODE: ${{ needs.template-env.outputs.ENV_CODE }}
+      ACR_NAME: ${{ needs.template-env.outputs.ACR_NAME }}
+      RESOURCE_GROUP: ${{ needs.template-env.outputs.RESOURCEGROUPNAME }}
+      CONTAINER_APP_ENV_NAME: ${{ needs.template-env.outputs.CONTAINER_APP_ENV_NAME }}
+      CONTAINER_NAME: ${{ needs.template-env.outputs.UI_CONTAINER_APP_NAME }}
+      PORT: ${{ needs.template-env.outputs.UI_PORT }}
+      IMAGE_NAME: ${{ needs.build-ui.outputs.IMAGE_NAME }}
+
+  # ------------------------------------------------------------------------------------------------------------------------
+  create-deploy-ui:
+    name: Create Container App in ${{ inputs.deployEnvironment }}
+    uses: ./.github/workflows/template-aca-create.yml
+    if: ${{ inputs.deployAction == 'create-build-deploy' }}
+    needs:
+      - build-ui
+      - template-env
+    secrets: inherit
+    with:
+      ENV_CODE: ${{ needs.template-env.outputs.ENV_CODE }}
+      ACR_NAME: ${{ needs.template-env.outputs.ACR_NAME }}
+      RESOURCE_GROUP: ${{ needs.template-env.outputs.RESOURCEGROUPNAME }}
+      CONTAINER_APP_ENV_NAME: ${{ needs.template-env.outputs.CONTAINER_APP_ENV_NAME }}
+      CONTAINER_NAME: ${{ needs.template-env.outputs.UI_CONTAINER_APP_NAME }}
+      PORT: ${{ needs.template-env.outputs.UI_PORT }}
+      IMAGE_NAME: ${{ needs.build-ui.outputs.IMAGE_NAME }}
+      USER_ASSIGNED_IDENTITY_ID: ${{ needs.template-env.outputs.USER_ASSIGNED_IDENTITY_ID }}
+      KEY_VAULT_NAME: ${{ needs.template-env.outputs.KEY_VAULT_NAME }}

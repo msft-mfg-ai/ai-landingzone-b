@@ -1,0 +1,64 @@
+// --------------------------------------------------------------------------------
+// This file contains the parameters for the Bicep deployment.
+// Note: This is dynamically modified by the build process.
+// Anything that starts with a # and a { is a variable that will be replaced at runtime.
+// --------------------------------------------------------------------------------
+// The following values should be defined in GitHub Secrets or Environment Variables:
+//   APP_NAME            - GH Repository Variable - no need to override
+//   USER_PRINCIPAL_ID   - GH Environment Secret - User Principal ID - this is you - BYO User
+//   INSTANCE_NUMBER     - GH Environment Variable
+//   OWNER_EMAIL         - GH Environment Variable - optional
+//   runBuildDeployAPI    - Runtime  - User decision to deploy webapp or not
+//   environmentName     - Runtime  - Environment Code (e.g., dev, qa, prod)
+// --------------------------------------------------------------------------------
+
+using './main-basic.bicep'
+
+param applicationName = '#{APP_NAME}#'
+param environmentName = '#{ENVIRONMENT_CODE}#'
+param principalId = '#{USER_PRINCIPAL_ID}#'
+param instanceNumber = '#{INSTANCE_NUMBER}#'
+param regionCode = '#{GLOBAL_REGION_CODE}#' 
+
+param businessOwnerTag  = '#{BUSINESS_OWNER}#'
+param applicationOwnerTag  = '#{APPLICATION_OWNER}#'
+param costCenterTag  = '#{COST_CENTER}#'
+
+param gpt40_DeploymentCapacity = empty('#{AI_MODEL_CAPACITY}#') ? null : int('#{AI_MODEL_CAPACITY}#')
+param gpt41_DeploymentCapacity = empty('#{AI_MODEL_CAPACITY}#') ? null : int('#{AI_MODEL_CAPACITY}#')
+
+param apimBaseUrl = empty('#{APIM_BASE_URL}#') ? null : '#{APIM_BASE_URL}#'
+param apimAccessUrl = empty('#{APIM_ACCESS_URL}#') ? null : '#{APIM_ACCESS_URL}#'
+param apimAccessKey = empty('#{APIM_ACCESS_KEY}#') ? null : '#{APIM_ACCESS_KEY}#'
+
+param entraTenantId = empty('#{ENTRA_TENANT_ID}#') ? null : '#{ENTRA_TENANT_ID}#'
+param entraApiAudience = empty('#{ENTRA_API_AUDIENCE}#') ? null : '#{ENTRA_API_AUDIENCE}#'
+param entraScopes = empty('#{ENTRA_SCOPES}#') ? null : '#{ENTRA_SCOPES}#'
+param entraRedirectUri = empty('#{ENTRA_REDIRECT_URI}#') ? null : '#{ENTRA_REDIRECT_URI}#'
+@secure()
+param entraClientId = empty('#{ENTRA_CLIENT_ID}#') ? null : '#{ENTRA_CLIENT_ID}#'
+@secure()
+param entraClientSecret = empty('#{ENTRA_CLIENT_SECRET}#') ? null : '#{ENTRA_CLIENT_SECRET}#'
+
+param addRoleAssignments = empty('#{addRoleAssignments}#') ? false : toLower('#{addRoleAssignments}#') == 'true'
+param publicAccessEnabled = true
+param makeWebAppsPublic = true
+
+param deployAPIM = empty('#{deployAPIM}#') ? false : toLower('#{deployAPIM}#') == 'true'
+// Should we deploy the API Management service?
+param deployUIApp = empty('#{deployUIApp}#') ? false : toLower('#{deployUIApp}#') == 'true'
+// Should we deploy the UI app?
+
+// applications
+param uiImageName = empty('#{UI_IMAGE_NAME}#') ? null : '#{UI_IMAGE_NAME}#'
+
+// only for Microsoft internal deployments
+param mockUserUpn = empty('#{MOCK_USER_UPN}#') ? false : toLower('#{MOCK_USER_UPN}#') == 'true' // Mock user UPN for testing purposes
+
+// use consumption for non-customer deployments
+param containerAppEnvironmentWorkloadProfiles = [
+  {
+    name: 'consumption'
+    workloadProfileType: 'consumption'
+  }
+]

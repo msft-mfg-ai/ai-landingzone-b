@@ -1,0 +1,84 @@
+# ----------------------------------------------------------------------------------------------------
+# Pipeline to build and deploy one Container App Module
+# ----------------------------------------------------------------------------------------------------
+name: $(date:yyyy).$(date:MM).$(date:dd)$(rev:.r)
+pool:
+  vmImage: 'ubuntu-latest'
+# ----------------------------------------------------------------------------------------------------
+trigger: none
+
+# ----------------------------------------------------------------------------------------------------
+parameters:
+- name: deployToEnvironment
+  displayName: Deploy To
+  type: string
+  values:
+    - DEV
+    - QA
+    - PROD
+    - DEV-QA-PROD
+  default: DEV
+- name: buildApps
+  displayName: Build Docker Images
+  type: boolean
+  default: true
+- name: pushApps
+  displayName: Push Images to ACR
+  type: boolean
+  default: true
+- name: deployAction
+  displayName: Deploy Action
+  type: string
+  values:
+    - build-deploy
+    - create-build-deploy
+    - none
+  default: 'build-deploy'
+- name: updateACRFirewall
+  displayName: Update ACR Firewall
+  type: boolean 
+  default: false
+- name: runMSDevSecOpsScan
+  displayName: Run Scan
+  type: boolean
+  default: false
+
+# ----------------------------------------------------------------------------------------------------
+variables:
+  - group: AI.LZ.Secrets
+  - template: vars/var-service-connections.yml
+
+# ----------------------------------------------------------------------------------------------------
+stages:
+- ${{ if parameters.runMSDevSecOpsScan }}:
+    - stage: ScanApplication
+      displayName: Scan Application
+      jobs:
+        - template: pipes/templates/scan-code-template.yml
+          parameters:
+            environmentName: 'DEV'
+            runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
+            runGHASScan: false
+
+- ${{ if ne(parameters.deployToEnvironment, 'DEV-QA-PROD') }}:
+  - template: pipes/build-deploy-app-pipe.yml
+    parameters:
+      environments: ['${{ parameters.deployToEnvironment }}']
+      singleEnvironment: 'true'
+      pushToACR: ${{ parameters.pushApps }}
+      deployAction: ${{ parameters.deployAction }}
+      updateACRFirewall: ${{ parameters.updateACRFirewall }}
+      apps: [ 
+        { containerAppName: 'ui',  acrAppName: 'chatui',  projectFolderName: 'src/website/chatui', port: '8080' }
+      ] 
+
+- ${{ if eq(parameters.deployToEnvironment, 'DEV-QA-PROD') }}:
+  - template: pipes/build-deploy-app-pipe.yml
+    parameters:
+      environments: ['DEV', 'QA', 'PROD']
+      pushToACR: ${{ parameters.pushApps }}
+      deployAction: ${{ parameters.deployAction }}
+      updateACRFirewall: ${{ parameters.updateACRFirewall }}
+      apps: [ 
+        { containerAppName: 'ui',  acrAppName: 'chatui',  projectFolderName: 'src/website/chatui', port: '8080' }
+      ] 

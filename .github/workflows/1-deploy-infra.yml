@@ -1,0 +1,103 @@
+# ------------------------------------------------------------------------------------------------------------------------
+# Action: Deploy Azure Resources via Bicep Files
+# ------------------------------------------------------------------------------------------------------------------------
+name: 1 - Deploy Infrastructure
+run-name: '1 - Deploy Infra: ${{ inputs.bicepDeploymentMode }} / ${{ inputs.bicepVersion }} / ENV ${{ inputs.deployEnvironment }} by @${{ github.actor }}'
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployEnvironment:
+        description: Environment
+        required: true
+        type: environment
+        # default: 'dev'
+      bicepVersion:
+        description: Version - Basic=public, Advanced=VNET
+        required: true
+        default: 'advanced'
+        type: choice
+        options:
+          - basic
+          - advanced
+      appsToDeploy:
+        description: Apps to Deploy
+        default: UI
+        type: choice
+        options:
+          - none
+          - UI
+      bicepDeploymentMode:
+        description: Bicep Mode
+        default: create
+        type: choice
+        options:
+          - create
+          - whatIf
+      createResourceGroup:
+        description: Create Resource Group?
+        type: boolean
+        default: true
+      addRoleAssignments:
+        description: Add Role Assignments?
+        type: boolean
+        default: true
+      makeWebAppsPublic:
+        description: Make Web Apps Public?
+        type: boolean
+        default: true
+      runMSSecurityScan:
+        description: Run MS DevSecOps Security Scan
+        required: false
+        default: true
+        type: boolean
+
+      # deployAPIM:
+      #   description: Deploy APIM?
+      #   type: boolean
+      #   default: false
+
+# ------------------------------------------------------------------------------------------------------------------------
+jobs:
+  scan-code:
+    name: Scan Source Code
+    uses: ./.github/workflows/template-scan-code.yml
+    if: inputs.runMSSecurityScan
+    secrets: inherit
+    permissions:
+      id-token: write
+      contents: write
+      actions: read
+      pages: write
+      security-events: write
+      checks: write
+      issues: read
+      pull-requests: read
+      packages: read
+    with:
+      runMSDevSecOpsScan: ${{ inputs.runMSSecurityScan }}
+      runGHASScan: false # $ { { inputs.runGHASSecurityScan } }
+
+# ------------------------------------------------------------------------------------------------------------------------
+  Deploy_Bicep:
+    name: Deploy ${{ inputs.deployEnvironment }} Bicep (${{ inputs.bicepDeploymentMode }})
+    uses: ./.github/workflows/template-create-infra.yml
+    secrets: inherit
+    permissions:
+      id-token: write
+      contents: read
+      actions: read
+      pages: write
+    with:
+      envCode: ${{ inputs.deployEnvironment }}
+      templatePath: './infra/bicep/'
+      templateFile: 'main-${{ inputs.bicepVersion }}.bicep'
+      parameterFile: 'main-${{ inputs.bicepVersion }}-gh.bicepparam'
+      parameterFileReplaceTokens: 'true'
+      requestorName: ${{ github.actor }}
+      createResourceGroup: ${{ inputs.createResourceGroup }}
+      addRoleAssignments: ${{ inputs.addRoleAssignments }}
+      appsToDeploy: ${{ inputs.appsToDeploy }}
+      bicepDeploymentMode: ${{ inputs.bicepDeploymentMode }}
+      makeWebAppsPublic: ${{ inputs.makeWebAppsPublic }}
+      #deployAPIM: ${{ inputs.deployAPIM }}
