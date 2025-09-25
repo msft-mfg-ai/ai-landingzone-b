@@ -303,6 +303,7 @@ module vnet './modules/networking/vnet.bicep' = {
     subnetAppSePrefix: subnetAppSePrefix
     subnetPeName: !empty(subnetPeName) ? subnetPeName : resourceNames.outputs.subnet.peName
     subnetPePrefix: subnetPePrefix
+    subnetPeRouteTableEnabled: true
     subnetAgentName: !empty(subnetAgentName) ? subnetAgentName : resourceNames.outputs.subnet.agentName
     subnetAgentPrefix: subnetAgentPrefix
     subnetBastionName: !empty(subnetBastionName) ? subnetBastionName : resourceNames.outputs.subnet.bastionName

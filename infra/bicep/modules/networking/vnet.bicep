@@ -16,6 +16,7 @@ param subnetAppSeName string
 param subnetAppSePrefix string?
 param subnetPeName string
 param subnetPePrefix string?
+param subnetPeRouteTableEnabled bool = true
 param subnetAgentName string
 param subnetAgentPrefix string?
 param subnetBastionName string
@@ -87,6 +88,9 @@ resource newVirtualNetwork 'Microsoft.Network/virtualNetworks@2024-01-01' = if (
         properties: {
           addressPrefix: subnetPePrefix
           // The subnet of the private endpoint must be delegated to the service 'Microsoft.Network/privateEndpoints'
+
+          // This is needed if the network needs RouteTables
+          privateEndpointNetworkPolicies: subnetPeRouteTableEnabled ? 'RouteTableEnabled' : 'Disabled'
         }
       }
       {
