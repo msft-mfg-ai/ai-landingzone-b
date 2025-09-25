@@ -16,7 +16,7 @@ param regionCode string = 'US'
 
 @description('Instance number for the application, e.g. 001, 002, etc. This is used to differentiate multiple instances of the same application in the same environment.')
 @maxLength(3)
-@minLength(3)
+@minLength(1)
 param instance string = '000'
 
 @description('Optional resource token to ensure uniqueness - leave blank if desired')
@@ -43,7 +43,7 @@ var resourceTokenWithoutDash = resourceToken == '' ? '' : '${resourceToken}'
 
 var dashInstance = instance == '' ? '' : toLower('-${instance}')
 var dashProject = instance == '' ? '' : toLower('-${projectNumber}')
-var partialInstance = substring(instance, 2, 1) // get last digit of a three digit code
+var partialInstance = length(instance) > 2 ? substring(instance, 2, 1) : instance // get last digit of a three digit code
 var partialRegion = substring(regionCode, 0, 1) // get first digit of a two digit code
 
 // pull resource abbreviations from a common JSON file
