@@ -59,7 +59,7 @@ param existingVnetName string = ''
 @description('If you provide an existing VNET what resource group is it in?')
 param existingVnetResourceGroupName string = ''
 @description('If you provide this is will be used instead of creating a new VNET')
-param vnetPrefix string = '110.237.144.0/22'                         // '172.16.4.0/22'   -or- '10.183.4.0/22'
+param vnetPrefix string = '10.237.144.0/22'                         // '172.16.4.0/22'   -or- '10.183.4.0/22'
 param subnetAppGwName string = ''
 param subnetAppGwPrefix string = cidrSubnet(vnetPrefix, 24, 1)    // '172.16.5.0/24'   -or- '10.183.5.0/24'
 param subnetAppSeName string = ''
