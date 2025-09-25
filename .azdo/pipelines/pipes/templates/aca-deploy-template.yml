@@ -70,6 +70,9 @@ jobs:
             $containerRegistryUrl="cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER).azurecr.io"
             echo "##vso[task.setvariable variable=containerRegistryUrl]$containerRegistryUrl"
 
+            $agentIpAddress = $(Invoke-WebRequest -Uri "https://api.ipify.org").Content
+            echo "##vso[task.setvariable variable=agentIpAddress]$agentIpAddress"
+
             echo "environmentCodeLower=$environmentCodeLower"
             echo "appNameNoDashesLower=$appNameNoDashesLower"
             echo "resourceGroupName=$resourceGroupName"
@@ -99,6 +102,21 @@ jobs:
       #       echo "Logging in to $(acrName)"
       #       az acr login -n $(acrName)
 
+
+      # ----------------------------------------------------------------------------------------------------
+      # Add Firewall rule to ACR for the build agent IP address and login
+      # ----------------------------------------------------------------------------------------------------
+      - template: steps-container-registry-template.yml
+        parameters:
+          action: 'add-login'
+          serviceConnectionName: $(serviceConnectionName)
+          registryName: $(containerRegistryName)
+          registryResourceGroup: $(resourceGroupName)
+          imageName: $(imageName)
+          imageNameLatest: $(imageNameBranch)
+          updateFirewall: ${{ parameters.updateFirewall }}
+          agentIpAddress: $(agentIpAddress)
+
       # ----------------------------------------------------------------------------------------------------
       # Deploy the container app image
       # ----------------------------------------------------------------------------------------------------
@@ -114,4 +132,18 @@ jobs:
               --resource-group $(resourceGroupName) \
               --image $(containerRegistryUrl)/$(imageName) \
               --container-name app
+
+      # ----------------------------------------------------------------------------------------------------
+      # Remove Firewall rule to ACR for the build agent IP address and login
+      # ----------------------------------------------------------------------------------------------------
+      - template: steps-container-registry-template.yml
+        parameters:
+          action: 'remove'
+          serviceConnectionName: $(serviceConnectionName)
+          registryName: $(containerRegistryName)
+          registryResourceGroup: $(resourceGroupName)
+          imageName: $(imageName)
+          imageNameLatest: $(imageNameBranch)
+          updateFirewall: ${{ parameters.updateFirewall }}
+          agentIpAddress: $(agentIpAddress)
 

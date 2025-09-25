@@ -77,6 +77,9 @@ jobs:
             $containerAppEnvName="cae-$($appNameNoDashesLower)-$($environmentCodeLower)-$(INSTANCE_NUMBER)"
             echo "##vso[task.setvariable variable=containerAppEnvName]$containerAppEnvName"
 
+            $agentIpAddress = $(Invoke-WebRequest -Uri "https://api.ipify.org").Content
+            echo "##vso[task.setvariable variable=agentIpAddress]$agentIpAddress"
+
             echo "environmentCodeLower=$environmentCodeLower"
             echo "appNameNoDashesLower=$appNameNoDashesLower"
             echo "resourceGroupName=$resourceGroupName"
@@ -96,6 +99,20 @@ jobs:
             echo "##[group]Display All Environment Variables:"
             printenv | sort
             echo "##[endgroup]"
+
+      # ----------------------------------------------------------------------------------------------------
+      # Add Firewall rule to ACR for the build agent IP address and login
+      # ----------------------------------------------------------------------------------------------------
+      - template: steps-container-registry-template.yml
+        parameters:
+          action: 'add-login'
+          serviceConnectionName: $(serviceConnectionName)
+          registryName: $(containerRegistryName)
+          registryResourceGroup: $(resourceGroupName)
+          imageName: $(imageName)
+          imageNameLatest: $(imageNameBranch)
+          updateFirewall: ${{ parameters.updateFirewall }}
+          agentIpAddress: $(agentIpAddress)
 
       # ----------------------------------------------------------------------------------------------------
       # Deploy the container app image
@@ -132,3 +149,17 @@ jobs:
               --max-replicas 1 \
               --ingress external \
               --container-name app
+
+      # ----------------------------------------------------------------------------------------------------
+      # Remove Firewall rule to ACR for the build agent IP address and login
+      # ----------------------------------------------------------------------------------------------------
+      - template: steps-container-registry-template.yml
+        parameters:
+          action: 'remove'
+          serviceConnectionName: $(serviceConnectionName)
+          registryName: $(containerRegistryName)
+          registryResourceGroup: $(resourceGroupName)
+          imageName: $(imageName)
+          imageNameLatest: $(imageNameBranch)
+          updateFirewall: ${{ parameters.updateFirewall }}
+          agentIpAddress: $(agentIpAddress)
