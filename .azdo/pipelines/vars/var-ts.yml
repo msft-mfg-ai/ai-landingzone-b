@@ -5,11 +5,11 @@
 # common file if you want to make them different for each environment, like the SKU or location.
 # ----------------------------------------------------------------------------------------------------
 variables:
-  # - name: resourceGroupName
-  #   value: 'rg-ai-label-qa'
-  - name: existingVnetName
-    value: '' # 'vnet-ai-label-qa'
-  - name: subnet1Name    # Subnet name for the private endpoints
-    value: '' # 'snet-ai-label-qa-138' # 10.233.138.0/26
-  - name: subnet2Name    # Subnet name for the application
-    value: '' # 'snet-ai-label-qa-136' # 10.233.136.0/23
+  - name:   RESOURCEGROUP_LOCATION
+    value: 'eastus2'
+  - name:   AIFOUNDRY_DEPLOY_LOCATION
+    value: 'eastus2'
+  - name:   OPENAI_DEPLOY_LOCATION
+    value: 'eastus2'
+  - name:   AI_MODEL_CAPACITY
+    value: '50'
