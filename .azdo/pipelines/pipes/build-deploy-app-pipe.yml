@@ -37,39 +37,6 @@ stages:
 # ----------------------------------------------------------------------------------------------------
 - ${{ each environmentCode in parameters.environments }}:
   - ${{ each app in parameters.apps }}:
-
-    # ----------------------------------------------------------------------------------------------------
-    # Add Firewall rule to ACR for the build agent IP address
-    # ----------------------------------------------------------------------------------------------------
-    - stage: FWAdd${{ app.containerAppName }}${{ environmentCode }}
-      displayName: ACR FW-Add ${{ environmentCode }}
-      condition: ${{ parameters.updateACRFirewall }}
-      jobs:
-      - job: FWAdd${{ app.containerAppName }}${{ environmentCode }}Job
-        steps:
-        # because this is passing a service connection name, that has to be resolved at compile time, hence the IF/SWITCH
-        - ${{ if eq(upper(environmentCode), 'DV') }}:
-          - template: templates/steps-container-registry-template.yml
-            parameters:
-              action: 'add'
-              environmentCode: ${{ environmentCode }}
-              serviceConnectionName: $(serviceConnectionDV)
-              updateFirewall: ${{ parameters.updateACRFirewall }}
-        - ${{ if eq(upper(environmentCode), 'TS') }}:
-          - template: templates/steps-container-registry-template.yml
-            parameters:
-              action: 'add'
-              environmentCode: ${{ environmentCode }}
-              serviceConnectionName: $(serviceConnectionTS)
-              updateFirewall: ${{ parameters.updateACRFirewall }}
-        - ${{ if eq(upper(environmentCode), 'PD') }}:
-          - template: templates/steps-container-registry-template.yml
-            parameters:
-              action: 'add'
-              environmentCode: ${{ environmentCode }}
-              serviceConnectionName: $(serviceConnectionPD)
-              updateFirewall: ${{ parameters.updateACRFirewall }}
-
     # -- BUILD STAGE - Based on environment ----------------------------------------------------------
     - stage: Build${{ app.containerAppName }}${{ environmentCode }}
       displayName: Build ${{ app.containerAppName }} ${{ environmentCode }}
@@ -169,37 +136,4 @@ stages:
               containerAppName: ${{ app.containerAppName }}
               acrAppName: ${{ app.acrAppName }}
               port: ${{ app.port }}
-              updateFirewall: ${{ parameters.updateACRFirewall }}
-
-
-    # ----------------------------------------------------------------------------------------------------
-    # Remove Firewall rule to ACR for the build agent IP address and login
-    # ----------------------------------------------------------------------------------------------------
-    - stage: FWRemove${{ app.containerAppName }}${{ environmentCode }}
-      displayName: ACR FW-Remove ${{ environmentCode }}
-      condition: ${{ parameters.updateACRFirewall }}
-      jobs:
-      - job: FWRemove${{ app.containerAppName }}${{ environmentCode }}Job
-        steps:
-        # because this is passing a service connection name, that has to be resolved at compile time, hence the IF/SWITCH
-        - ${{ if eq(upper(environmentCode), 'DV') }}:
-          - template: templates/steps-container-registry-template.yml
-            parameters:
-              action: 'remove'
-              environmentCode: ${{ environmentCode }}
-              serviceConnectionName: $(serviceConnectionDV)
-              updateFirewall: ${{ parameters.updateACRFirewall }}
-        - ${{ if eq(upper(environmentCode), 'TS') }}:
-          - template: templates/steps-container-registry-template.yml
-            parameters:
-              action: 'remove'
-              environmentCode: ${{ environmentCode }}
-              serviceConnectionName: $(serviceConnectionTS)
-              updateFirewall: ${{ parameters.updateACRFirewall }}
-        - ${{ if eq(upper(environmentCode), 'PD') }}:
-          - template: templates/steps-container-registry-template.yml
-            parameters:
-              action: 'remove'
-              environmentCode: ${{ environmentCode }}
-              serviceConnectionName: $(serviceConnectionPD)
               updateFirewall: ${{ parameters.updateACRFirewall }}

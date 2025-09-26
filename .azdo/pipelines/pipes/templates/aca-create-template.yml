@@ -127,6 +127,9 @@ jobs:
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
+            echo "Logging in to $(containerRegistryName)"
+            az acr login -n $(containerRegistryName)
+            
             echo "Deploying Container App: $(caAppName) to Resource Group: $(resourceGroupName) in Environment: $(containerAppEnvName)"
             echo 'EXECUTING: az containerapp create --name $(caAppName) --resource-group $(resourceGroupName) --environment $(containerAppEnvName) --image $(containerRegistryUrl)/$(imageName) --target-port ${{ parameters.port }} --env-vars AppAgentEndpoint="$(APP_AGENT_ENDPOINT)" AppAgentId="$(APP_AGENT_ID)" AZURE_CLIENT_ID="$userAssignedIdentityId" ... --user-assigned "$userAssignedIdentityId" --registry-server "$(containerRegistryName).azurecr.io" ... '
             az containerapp create \

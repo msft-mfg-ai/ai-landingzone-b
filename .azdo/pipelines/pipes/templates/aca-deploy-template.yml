@@ -130,6 +130,9 @@ jobs:
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
+            echo "Logging in to $(containerRegistryName)"
+            az acr login -n $(containerRegistryName)
+            
             az containerapp update \
               --name $(caAppName) \
               --resource-group $(resourceGroupName) \
