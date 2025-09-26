@@ -43,6 +43,7 @@ stages:
     # ----------------------------------------------------------------------------------------------------
     - stage: FWAdd${{ app.containerAppName }}${{ environmentCode }}
       displayName: ACR FW-Add ${{ environmentCode }}
+      condition: ${{ parameters.updateACRFirewall }}
       jobs:
       - job: FWAdd${{ app.containerAppName }}${{ environmentCode }}Job
         steps:
@@ -50,24 +51,24 @@ stages:
         - ${{ if eq(upper(environmentCode), 'DV') }}:
           - template: templates/steps-container-registry-template.yml
             parameters:
-              action: 'add-login'
+              action: 'add'
               environmentCode: ${{ environmentCode }}
               serviceConnectionName: $(serviceConnectionDV)
-              updateFirewall: ${{ parameters.updateFirewall }}
+              updateFirewall: ${{ parameters.updateACRFirewall }}
         - ${{ if eq(upper(environmentCode), 'TS') }}:
           - template: templates/steps-container-registry-template.yml
             parameters:
-              action: 'add-login'
+              action: 'add'
               environmentCode: ${{ environmentCode }}
               serviceConnectionName: $(serviceConnectionTS)
-              updateFirewall: ${{ parameters.updateFirewall }}
+              updateFirewall: ${{ parameters.updateACRFirewall }}
         - ${{ if eq(upper(environmentCode), 'PD') }}:
           - template: templates/steps-container-registry-template.yml
             parameters:
-              action: 'add-login'
+              action: 'add'
               environmentCode: ${{ environmentCode }}
               serviceConnectionName: $(serviceConnectionPD)
-              updateFirewall: ${{ parameters.updateFirewall }}
+              updateFirewall: ${{ parameters.updateACRFirewall }}
 
     # -- BUILD STAGE - Based on environment ----------------------------------------------------------
     - stage: Build${{ app.containerAppName }}${{ environmentCode }}
@@ -176,6 +177,7 @@ stages:
     # ----------------------------------------------------------------------------------------------------
     - stage: FWRemove${{ app.containerAppName }}${{ environmentCode }}
       displayName: ACR FW-Remove ${{ environmentCode }}
+      condition: ${{ parameters.updateACRFirewall }}
       jobs:
       - job: FWRemove${{ app.containerAppName }}${{ environmentCode }}Job
         steps:
@@ -186,18 +188,18 @@ stages:
               action: 'remove'
               environmentCode: ${{ environmentCode }}
               serviceConnectionName: $(serviceConnectionDV)
-              updateFirewall: ${{ parameters.updateFirewall }}
+              updateFirewall: ${{ parameters.updateACRFirewall }}
         - ${{ if eq(upper(environmentCode), 'TS') }}:
           - template: templates/steps-container-registry-template.yml
             parameters:
               action: 'remove'
               environmentCode: ${{ environmentCode }}
               serviceConnectionName: $(serviceConnectionTS)
-              updateFirewall: ${{ parameters.updateFirewall }}
+              updateFirewall: ${{ parameters.updateACRFirewall }}
         - ${{ if eq(upper(environmentCode), 'PD') }}:
           - template: templates/steps-container-registry-template.yml
             parameters:
               action: 'remove'
               environmentCode: ${{ environmentCode }}
               serviceConnectionName: $(serviceConnectionPD)
-              updateFirewall: ${{ parameters.updateFirewall }}
+              updateFirewall: ${{ parameters.updateACRFirewall }}
