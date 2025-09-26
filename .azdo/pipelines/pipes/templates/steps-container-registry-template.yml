@@ -16,6 +16,8 @@
 parameters:
   - name: action
     default: 'add' # 'add' or 'add-login' or 'push' or 'add-login-push-remove' or 'remove'
+  - name: environmentCode
+    default: ''
   - name: serviceConnectionName
     default: ''
   - name: registryName
@@ -48,33 +50,60 @@ steps:
   #     echo "##vso[task.setvariable variable=agentIpAddress]$agentIpAddress"
   #   displayName: Create Variables Bash
 
-  - task: CmdLine@2
-    displayName: 'Display CR Parameters'
-    #condition: eq($System.Debug, true)
+  - task: PowerShell@2
+    displayName: Create Variables
+    continueOnError: true
     inputs:
+      targetType: 'inline'
       script: |
-        if [ -z "${{ parameters.registryName }}" ]; then
-        $containerRegistryName="cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER)"
-        else
-        $containerRegistryName="$(echo "${{ parameters.registryName }}")"
-        fi
-        echo "##vso[task.setvariable variable=containerRegistryName]$containerRegistryName"
+        $environmentCodeLower="${{ parameters.environmentCode }}".ToLower()
+        $appNameLowerNoDashes="$(APP_NAME)".ToLower().Replace("-", "")
 
-        if [ -z "${{ parameters.agentIpAddress }}" ]; then
-        $ipAddress=$(Invoke-WebRequest -Uri "https://api.ipify.org").Content
-        else
-        $ipAddress="$(echo "${{ parameters.agentIpAddress }}")"
-        fi
+        if ([string]::IsNullOrEmpty("${{ parameters.registryName }}")) {
+          $containerRegistryName=("cr$($appNameLowerNoDashes)$($environmentCodeLower)$(INSTANCE_NUMBER)").ToLower()
+        } else {
+          $containerRegistryName="${{ parameters.registryName }}"
+        }
+        echo "##vso[task.setvariable variable=containerRegistryName]$containerRegistryName"
+        echo "containerRegistryName=$containerRegistryName"
+
+        if ([string]::IsNullOrEmpty("${{ parameters.registryResourceGroup }}")) {
+          $resourceGroupName = ("$(RESOURCEGROUP_PREFIX)-$environmentCodeLower-$(INSTANCE_NUMBER)").ToLower()
+        } else {
+          $resourceGroupName="${{ parameters.registryResourceGroup }}"
+        }
+        echo "##vso[task.setvariable variable=resourceGroupName]$resourceGroupName"
+        echo "resourceGroupName=$resourceGroupName"
+
+        if ([string]::IsNullOrEmpty("${{ parameters.agentIpAddress }}")) {
+          $ipAddress=$(Invoke-WebRequest -Uri "https://api.ipify.org").Content
+        } else {
+          $ipAddress="${{ parameters.agentIpAddress }}"
+        }
         echo "##vso[task.setvariable variable=ipAddress]$ipAddress"
+        echo "ipAddress=$ipAddress"
+
+  - task: PowerShell@2
+    displayName: Display Variables
+    continueOnError: true
+    inputs:
+      targetType: 'inline'
+      script: |
+        echo "serviceConnectionName=${{ parameters.serviceConnectionName }}"
+        echo "action=${{ parameters.action }}"
+        echo "environmentCode=${{ parameters.environmentCode }}"
+        echo "imageName=${{ parameters.imageName }}"
+        echo "imageNameLatest=${{ parameters.imageNameLatest }}"
+        echo "updateFirewall=${{ parameters.updateFirewall }}"
 
         echo "parameters.registryName=${{ parameters.registryName }}"
-        echo "containerRegistryName=$containerRegistryName"
-        echo "serviceConnectionName=${{ parameters.serviceConnectionName }}"
-        echo "registryResourceGroup=${{ parameters.registryResourceGroup }}"
-        echo "action=${{ parameters.action }}"
-        echo "agentIpAddress=${{ parameters.agentIpAddress }}"
-        echo "ipAddress=$ipAddress"
-    continueOnError: true
+        echo "containerRegistryName=$(containerRegistryName)"
+        
+        echo "parameters.agentIpAddress=${{ parameters.agentIpAddress }}"
+        echo "ipAddress=$(ipAddress)"
+
+        echo "parameters.registryResourceGroup=${{ parameters.registryResourceGroup }}"
+        echo "resourceGroupName=$(resourceGroupName)"
 
   - ${{ if and(contains(lower(parameters.action), 'add'), parameters.updateFirewall) }}:
     - task: AzureCLI@2
@@ -84,8 +113,8 @@ steps:
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
-          echo "Executing: az acr network-rule add --name $(containerRegistryName) --resource-group ${{ parameters.registryResourceGroup }} --ip-address $(ipAddress)")"
-          az acr network-rule add --name $(containerRegistryName) --resource-group ${{ parameters.registryResourceGroup }} --ip-address $(ipAddress)
+          echo "Executing: az acr network-rule add --name $(containerRegistryName) --resource-group $(resourceGroupName) --ip-address $(ipAddress)")"
+          az acr network-rule add --name $(containerRegistryName) --resource-group $(resourceGroupName) --ip-address $(ipAddress)
 
   # ----------------------------------------------------------------------------------------------------
   # Deploy with docker push - log in with service connection identity - it must have acrpush rights...
@@ -128,5 +157,5 @@ steps:
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
-          echo "Executing: az acr network-rule remove --name $(containerRegistryName) --resource-group ${{ parameters.registryResourceGroup }} --ip-address $(ipAddress)"
-          az acr network-rule remove --name $(containerRegistryName) --resource-group ${{ parameters.registryResourceGroup }} --ip-address $(ipAddress)
+          echo "Executing: az acr network-rule remove --name $(containerRegistryName) --resource-group $(resourceGroupName) --ip-address $(ipAddress)"
+          az acr network-rule remove --name $(containerRegistryName) --resource-group $(resourceGroupName) --ip-address $(ipAddress)

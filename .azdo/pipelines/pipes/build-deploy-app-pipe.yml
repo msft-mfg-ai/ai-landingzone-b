@@ -46,26 +46,27 @@ stages:
       jobs:
       - job: FWAdd${{ app.containerAppName }}${{ environmentCode }}Job
         steps:
+        # because this is passing a service connection name, that has to be resolved at compile time, hence the IF/SWITCH
         - ${{ if eq(upper(environmentCode), 'DV') }}:
           - template: templates/steps-container-registry-template.yml
             parameters:
-              action: 'add'
-              serviceConnectionName: $(serviceConnectionNameDV)
-              registryResourceGroup: $(resourceGroupName)
+              action: 'add-login'
+              environmentCode: ${{ environmentCode }}
+              serviceConnectionName: $(serviceConnectionDV)
               updateFirewall: ${{ parameters.updateFirewall }}
         - ${{ if eq(upper(environmentCode), 'TS') }}:
           - template: templates/steps-container-registry-template.yml
             parameters:
-              action: 'add'
-              serviceConnectionName: $(serviceConnectionNameTS)
-              registryResourceGroup: $(resourceGroupName)
+              action: 'add-login'
+              environmentCode: ${{ environmentCode }}
+              serviceConnectionName: $(serviceConnectionTS)
               updateFirewall: ${{ parameters.updateFirewall }}
         - ${{ if eq(upper(environmentCode), 'PD') }}:
           - template: templates/steps-container-registry-template.yml
             parameters:
-              action: 'add'
-              serviceConnectionName: $(serviceConnectionNamePD)
-              registryResourceGroup: $(resourceGroupName)
+              action: 'add-login'
+              environmentCode: ${{ environmentCode }}
+              serviceConnectionName: $(serviceConnectionPD)
               updateFirewall: ${{ parameters.updateFirewall }}
 
     # -- BUILD STAGE - Based on environment ----------------------------------------------------------
@@ -178,24 +179,25 @@ stages:
       jobs:
       - job: FWRemove${{ app.containerAppName }}${{ environmentCode }}Job
         steps:
+        # because this is passing a service connection name, that has to be resolved at compile time, hence the IF/SWITCH
         - ${{ if eq(upper(environmentCode), 'DV') }}:
           - template: templates/steps-container-registry-template.yml
             parameters:
               action: 'remove'
+              environmentCode: ${{ environmentCode }}
               serviceConnectionName: $(serviceConnectionDV)
-              registryResourceGroup: $(resourceGroupName)
               updateFirewall: ${{ parameters.updateFirewall }}
         - ${{ if eq(upper(environmentCode), 'TS') }}:
           - template: templates/steps-container-registry-template.yml
             parameters:
               action: 'remove'
+              environmentCode: ${{ environmentCode }}
               serviceConnectionName: $(serviceConnectionTS)
-              registryResourceGroup: $(resourceGroupName)
               updateFirewall: ${{ parameters.updateFirewall }}
         - ${{ if eq(upper(environmentCode), 'PD') }}:
           - template: templates/steps-container-registry-template.yml
             parameters:
               action: 'remove'
+              environmentCode: ${{ environmentCode }}
               serviceConnectionName: $(serviceConnectionPD)
-              registryResourceGroup: $(resourceGroupName)
               updateFirewall: ${{ parameters.updateFirewall }}

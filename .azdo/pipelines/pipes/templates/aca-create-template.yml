@@ -103,19 +103,19 @@ jobs:
             printenv | sort
             echo "##[endgroup]"
 
-      # ----------------------------------------------------------------------------------------------------
-      # Add Firewall rule to ACR for the build agent IP address and login
-      # ----------------------------------------------------------------------------------------------------
-      - template: steps-container-registry-template.yml
-        parameters:
-          action: 'login'
-          serviceConnectionName: $(serviceConnectionName)
-          registryName: $(containerRegistryName)
-          registryResourceGroup: $(resourceGroupName)
-          imageName: $(imageName)
-          imageNameLatest: $(imageNameBranch)
-          updateFirewall: ${{ parameters.updateFirewall }}
-          agentIpAddress: $(agentIpAddress)
+      # # ----------------------------------------------------------------------------------------------------
+      # # Add Login to ACR
+      # # ----------------------------------------------------------------------------------------------------
+      # - template: steps-container-registry-template.yml
+      #   parameters:
+      #     action: 'login'
+      #     serviceConnectionName: $(serviceConnectionName)
+      #     registryName: $(containerRegistryName)
+      #     registryResourceGroup: $(resourceGroupName)
+      #     imageName: $(imageName)
+      #     imageNameLatest: $(imageNameBranch)
+      #     updateFirewall: ${{ parameters.updateFirewall }}
+      #     agentIpAddress: $(agentIpAddress)
 
       # ----------------------------------------------------------------------------------------------------
       # Deploy the container app image
