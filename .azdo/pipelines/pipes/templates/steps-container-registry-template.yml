@@ -113,7 +113,7 @@ steps:
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
-          echo "Executing: az acr network-rule add --name $(containerRegistryName) --resource-group $(resourceGroupName) --ip-address $(ipAddress)")"
+          echo "Executing: az acr network-rule add --name $(containerRegistryName) --resource-group $(resourceGroupName) --ip-address $(ipAddress)"
           az acr network-rule add --name $(containerRegistryName) --resource-group $(resourceGroupName) --ip-address $(ipAddress)
 
   # ----------------------------------------------------------------------------------------------------
