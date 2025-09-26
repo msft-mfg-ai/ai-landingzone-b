@@ -39,7 +39,7 @@ stages:
         jobs:
           - template: templates/scan-code-template.yml
             parameters:
-              environmentCode: 'DV'
+              environmentCode: ${{ parameters.environments[0] }}
               runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
               runGHASScan: ${{ parameters.runGHASScan }}
 

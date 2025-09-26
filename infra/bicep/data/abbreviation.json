@@ -27,6 +27,7 @@
   "cognitiveServicesAIHub": "hub",
   "cognitiveServicesHubProject": "hub-proj",
   "cognitiveServicesFoundryProject": "proj",
+  "cognitiveServicesOpenAI": "oai",
   "cognitiveServicesTextAnalytics": "cog-ta-",
   "computeAvailabilitySets": "avail-",
   "computeCloudServices": "cld-",

@@ -37,7 +37,7 @@ parameters:
     values:
       - basic
       - advanced
-    default: basic
+    default: advanced
   - name: appsToDeploy
     displayName: Which Apps to build and deploy?
     type: string
@@ -64,7 +64,7 @@ parameters:
   - name: publicAccessEnabled
     displayName: Make Web Apps Public?
     type: boolean
-    default: true
+    default: false
   - name: runMSDevSecOpsScan
     displayName: Run MS DevSecOps Scan?
     type: boolean
