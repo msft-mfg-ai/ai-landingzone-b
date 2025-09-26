@@ -141,6 +141,7 @@ output pe object = {
   cosmosDbName:             toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.documentDBDatabaseAccounts}')
   keyVaultName:             toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.keyVaultVaults}')
   acrName:                  toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.containerRegistryRegistries}')
+  containerAppsName:        toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.appContainerApps}')
   appInsightsName:          toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.insightsComponents}')
   monitorName:              toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.operationalInsightsWorkspaces}')
   searchServiceName:        toLower('pep-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}-${resourceAbbreviations.searchSearchServices}')
