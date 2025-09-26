@@ -30,8 +30,8 @@ parameters:
   displayName: Deploy Action
   type: string
   values:
-    - build-deploy
-    - create-build-deploy
+    - build-deploy          # builds the binary and deploys the image
+    - create-build-deploy   # creates the container app, then builds the binary and deploys the image
     - none
   default: 'build-deploy'
 - name: updateACRFirewall

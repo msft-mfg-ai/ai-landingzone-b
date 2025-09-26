@@ -117,12 +117,12 @@ jobs:
           workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.projectFolderName }}'
 
       # ----------------------------------------------------------------------------------------------------
-      # ACR Push: Push to ACR, add/remove firewall rules and remove if requested
+      # ACR Push: Push to ACR
       # ----------------------------------------------------------------------------------------------------
       - ${{ if parameters.pushToACR }}:
         - template: steps-container-registry-template.yml
           parameters:
-            action: 'add-login-push-remove'
+            action: 'login-push'
             serviceConnectionName: ${{ parameters.serviceConnectionName }}
             registryName: $(containerRegistryName)
             registryResourceGroup: $(resourceGroupName)

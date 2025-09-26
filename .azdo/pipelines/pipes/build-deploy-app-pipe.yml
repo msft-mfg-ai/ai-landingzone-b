@@ -38,6 +38,36 @@ stages:
 - ${{ each environmentCode in parameters.environments }}:
   - ${{ each app in parameters.apps }}:
 
+    # ----------------------------------------------------------------------------------------------------
+    # Add Firewall rule to ACR for the build agent IP address
+    # ----------------------------------------------------------------------------------------------------
+    - stage: FWAdd${{ app.containerAppName }}${{ environmentCode }}
+      displayName: ACR FW-Add ${{ environmentCode }}
+      jobs:
+      - job: FWAdd${{ app.containerAppName }}${{ environmentCode }}Job
+        steps:
+        - ${{ if eq(upper(environmentCode), 'DV') }}:
+          - template: templates/steps-container-registry-template.yml
+            parameters:
+              action: 'add'
+              serviceConnectionName: $(serviceConnectionNameDV)
+              registryResourceGroup: $(resourceGroupName)
+              updateFirewall: ${{ parameters.updateFirewall }}
+        - ${{ if eq(upper(environmentCode), 'TS') }}:
+          - template: templates/steps-container-registry-template.yml
+            parameters:
+              action: 'add'
+              serviceConnectionName: $(serviceConnectionNameTS)
+              registryResourceGroup: $(resourceGroupName)
+              updateFirewall: ${{ parameters.updateFirewall }}
+        - ${{ if eq(upper(environmentCode), 'PD') }}:
+          - template: templates/steps-container-registry-template.yml
+            parameters:
+              action: 'add'
+              serviceConnectionName: $(serviceConnectionNamePD)
+              registryResourceGroup: $(resourceGroupName)
+              updateFirewall: ${{ parameters.updateFirewall }}
+
     # -- BUILD STAGE - Based on environment ----------------------------------------------------------
     - stage: Build${{ app.containerAppName }}${{ environmentCode }}
       displayName: Build ${{ app.containerAppName }} ${{ environmentCode }}
@@ -138,3 +168,34 @@ stages:
               acrAppName: ${{ app.acrAppName }}
               port: ${{ app.port }}
               updateFirewall: ${{ parameters.updateACRFirewall }}
+
+
+    # ----------------------------------------------------------------------------------------------------
+    # Remove Firewall rule to ACR for the build agent IP address and login
+    # ----------------------------------------------------------------------------------------------------
+    - stage: FWRemove${{ app.containerAppName }}${{ environmentCode }}
+      displayName: ACR FW-Remove ${{ environmentCode }}
+      jobs:
+      - job: FWRemove${{ app.containerAppName }}${{ environmentCode }}Job
+        steps:
+        - ${{ if eq(upper(environmentCode), 'DV') }}:
+          - template: templates/steps-container-registry-template.yml
+            parameters:
+              action: 'remove'
+              serviceConnectionName: $(serviceConnectionDV)
+              registryResourceGroup: $(resourceGroupName)
+              updateFirewall: ${{ parameters.updateFirewall }}
+        - ${{ if eq(upper(environmentCode), 'TS') }}:
+          - template: templates/steps-container-registry-template.yml
+            parameters:
+              action: 'remove'
+              serviceConnectionName: $(serviceConnectionTS)
+              registryResourceGroup: $(resourceGroupName)
+              updateFirewall: ${{ parameters.updateFirewall }}
+        - ${{ if eq(upper(environmentCode), 'PD') }}:
+          - template: templates/steps-container-registry-template.yml
+            parameters:
+              action: 'remove'
+              serviceConnectionName: $(serviceConnectionPD)
+              registryResourceGroup: $(resourceGroupName)
+              updateFirewall: ${{ parameters.updateFirewall }}

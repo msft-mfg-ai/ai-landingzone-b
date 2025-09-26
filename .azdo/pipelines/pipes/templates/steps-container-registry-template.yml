@@ -28,7 +28,6 @@ parameters:
     default: ''
   - name: updateFirewall
     default: true
-    type: boolean
   - name: agentIpAddress
     default: ''
 
@@ -54,11 +53,27 @@ steps:
     #condition: eq($System.Debug, true)
     inputs:
       script: |
+        if [ -z "${{ parameters.registryName }}" ]; then
+        $containerRegistryName="cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER)"
+        else
+        $containerRegistryName="$(echo "${{ parameters.registryName }}")"
+        fi
+        echo "##vso[task.setvariable variable=containerRegistryName]$containerRegistryName"
+
+        if [ -z "${{ parameters.agentIpAddress }}" ]; then
+        $ipAddress=$(Invoke-WebRequest -Uri "https://api.ipify.org").Content
+        else
+        $ipAddress="$(echo "${{ parameters.agentIpAddress }}")"
+        fi
+        echo "##vso[task.setvariable variable=ipAddress]$ipAddress"
+
+        echo "parameters.registryName=${{ parameters.registryName }}"
+        echo "containerRegistryName=$containerRegistryName"
         echo "serviceConnectionName=${{ parameters.serviceConnectionName }}"
-        echo "registryName=${{ parameters.registryName }}"
         echo "registryResourceGroup=${{ parameters.registryResourceGroup }}"
         echo "action=${{ parameters.action }}"
         echo "agentIpAddress=${{ parameters.agentIpAddress }}"
+        echo "ipAddress=$ipAddress"
     continueOnError: true
 
   - ${{ if and(contains(lower(parameters.action), 'add'), parameters.updateFirewall) }}:
@@ -69,8 +84,8 @@ steps:
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
-          echo "Executing: az acr network-rule add --name ${{ parameters.registryName }} --resource-group ${{ parameters.registryResourceGroup }} --ip-address ${{ parameters.agentIpAddress }}"
-          az acr network-rule add --name ${{ parameters.registryName }} --resource-group ${{ parameters.registryResourceGroup }} --ip-address ${{ parameters.agentIpAddress }}
+          echo "Executing: az acr network-rule add --name $(containerRegistryName) --resource-group ${{ parameters.registryResourceGroup }} --ip-address $(ipAddress)")"
+          az acr network-rule add --name $(containerRegistryName) --resource-group ${{ parameters.registryResourceGroup }} --ip-address $(ipAddress)
 
   # ----------------------------------------------------------------------------------------------------
   # Deploy with docker push - log in with service connection identity - it must have acrpush rights...
@@ -86,8 +101,8 @@ steps:
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
-          echo "Logging in to ${{ parameters.registryName }}.azurecr.io"
-          az acr login -n ${{ parameters.registryName }}
+          echo "Logging in to $(containerRegistryName).azurecr.io"
+          az acr login -n $(containerRegistryName)
 
   - ${{ if contains(lower(parameters.action), 'push') }}:
     - task: AzureCLI@2
@@ -97,13 +112,13 @@ steps:
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
-          echo "Pushing ${{ parameters.imageName }} to ${{ parameters.registryName }}.azurecr.io/${{ parameters.imageName }}"
-          docker tag ${{ parameters.imageName }} ${{ parameters.registryName }}.azurecr.io/${{ parameters.imageName }}
-          docker push ${{ parameters.registryName }}.azurecr.io/${{ parameters.imageName }}
+          echo "Pushing ${{ parameters.imageName }} to $(containerRegistryName).azurecr.io/${{ parameters.imageName }}"
+          docker tag ${{ parameters.imageName }} $(containerRegistryName).azurecr.io/${{ parameters.imageName }}
+          docker push $(containerRegistryName).azurecr.io/${{ parameters.imageName }}
 
-          echo "Pushing ${{ parameters.imageNameLatest }} to ${{ parameters.registryName }}.azurecr.io/${{ parameters.imageNameLatest }}"
-          docker tag ${{ parameters.imageName }} ${{ parameters.registryName }}.azurecr.io/${{ parameters.imageNameLatest }}
-          docker push ${{ parameters.registryName }}.azurecr.io/${{ parameters.imageNameLatest }}
+          echo "Pushing ${{ parameters.imageNameLatest }} to $(containerRegistryName).azurecr.io/${{ parameters.imageNameLatest }}"
+          docker tag ${{ parameters.imageName }} $(containerRegistryName).azurecr.io/${{ parameters.imageNameLatest }}
+          docker push $(containerRegistryName).azurecr.io/${{ parameters.imageNameLatest }}
 
   - ${{ if and(contains(lower(parameters.action), 'remove'), parameters.updateFirewall) }}:
     - task: AzureCLI@2
@@ -113,5 +128,5 @@ steps:
         scriptType: bash
         scriptLocation: inlineScript
         inlineScript: |
-          echo "Executing: az acr network-rule remove --name ${{ parameters.registryName }} --resource-group ${{ parameters.registryResourceGroup }} --ip-address ${{ parameters.agentIpAddress }}"
-          az acr network-rule remove --name ${{ parameters.registryName }} --resource-group ${{ parameters.registryResourceGroup }} --ip-address ${{ parameters.agentIpAddress }}
+          echo "Executing: az acr network-rule remove --name $(containerRegistryName) --resource-group ${{ parameters.registryResourceGroup }} --ip-address $(ipAddress)"
+          az acr network-rule remove --name $(containerRegistryName) --resource-group ${{ parameters.registryResourceGroup }} --ip-address $(ipAddress)
