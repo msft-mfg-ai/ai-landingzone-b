@@ -78,7 +78,7 @@ jobs:
       - name: Create UI Container App
         run: |
           echo "Creating UI Container App..."
-          echo 'EXECUTING: az containerapp create --name ${{ inputs.CONTAINER_NAME }} --resource-group ${{ inputs.RESOURCE_GROUP }} --environment ${{ inputs.CONTAINER_APP_ENV_NAME }} --image ${{ inputs.ACR_NAME }}.azurecr.io/${{ inputs.IMAGE_NAME }} --target-port ${{ inputs.PORT }} --env-vars AppAgentEndpoint="${{ vars.APP_AGENT_ENDPOINT }}" AppAgentId="${{ vars.APP_AGENT_ID }}" APPLICATIONINSIGHTS_CONNECTION_STRING="${{ vars.APPINSIGHTS_CONNECTIONSTRING }}" AZURE_CLIENT_ID="${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" ...  --user-assigned "${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" --registry-server "${{ inputs.ACR_NAME }}.azurecr.io" ...'
+          echo 'EXECUTING: az containerapp create --name ${{ inputs.CONTAINER_NAME }} --resource-group ${{ inputs.RESOURCE_GROUP }} --environment ${{ inputs.CONTAINER_APP_ENV_NAME }} --image ${{ inputs.ACR_NAME }}.azurecr.io/${{ inputs.IMAGE_NAME }} --target-port ${{ inputs.PORT }} --env-vars AppAgentEndpoint="${{ vars.APP_AGENT_ENDPOINT }}" AppAgentId="${{ vars.APP_AGENT_ID }}" AZURE_CLIENT_ID="${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" ...  --user-assigned "${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" --registry-server "${{ inputs.ACR_NAME }}.azurecr.io" ...'
           az containerapp create \
             --name ${{ inputs.CONTAINER_NAME }} \
             --resource-group ${{ inputs.RESOURCE_GROUP }} \
@@ -88,7 +88,6 @@ jobs:
             --env-vars \
               AppSettings__AppAgentEndpoint="${{ vars.APP_AGENT_ENDPOINT }}" \
               AppSettings__AppAgentId="${{ vars.APP_AGENT_ID }}" \
-              APPLICATIONINSIGHTS_CONNECTION_STRING="${{ vars.APPINSIGHTS_CONNECTIONSTRING }}" \
               AZURE_CLIENT_ID="${{ inputs.USER_ASSIGNED_IDENTITY_ID }}" \
               AZURE_SDK_TRACING_IMPLEMENTATION="opentelemetry" \
               AZURE_TRACING_GEN_AI_CONTENT_RECORDING_ENABLED="true" \
