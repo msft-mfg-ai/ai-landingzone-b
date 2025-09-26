@@ -22,6 +22,9 @@ parameters:
   - name: acrFolderName
     default: 'appImages'
     type: string
+  - name: updateFirewall
+    default: true
+    type: boolean
 
 # ----------------------------------------------------------------------------------------------------
 jobs:
@@ -146,4 +149,3 @@ jobs:
           imageNameLatest: $(imageNameBranch)
           updateFirewall: ${{ parameters.updateFirewall }}
           agentIpAddress: $(agentIpAddress)
-

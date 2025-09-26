@@ -46,7 +46,7 @@ stages:
         - ${{ if eq(upper(environmentCode), 'DV') }}:
           - template: templates/aca-build-template.yml
             parameters:
-              serviceConnectionName: $(serviceConnectionNameDV)
+              serviceConnectionName: $(serviceConnectionDV)
               environmentCode: ${{ environmentCode }}
               acrAppName: ${{ app.acrAppName }}
               projectFolderName: ${{ app.projectFolderName }}
@@ -55,7 +55,7 @@ stages:
         - ${{ if eq(upper(environmentCode), 'TS') }}:
           - template: templates/aca-build-template.yml
             parameters:
-              serviceConnectionName: $(serviceConnectionNameTS)
+              serviceConnectionName: $(serviceConnectionTS)
               environmentCode: ${{ environmentCode }}
               acrAppName: ${{ app.acrAppName }}
               projectFolderName: ${{ app.projectFolderName }}
@@ -64,7 +64,7 @@ stages:
         - ${{ if eq(upper(environmentCode), 'PD') }}:
           - template: templates/aca-build-template.yml
             parameters:
-              serviceConnectionName: $(serviceConnectionNamePD)
+              serviceConnectionName: $(serviceConnectionPD)
               environmentCode: ${{ environmentCode }}
               acrAppName: ${{ app.acrAppName }}
               projectFolderName: ${{ app.projectFolderName }}
@@ -80,27 +80,30 @@ stages:
         - ${{ if eq(upper(environmentCode), 'DV') }}:
           - template: templates/aca-deploy-template.yml
             parameters:
-              serviceConnectionName: $(serviceConnectionNameDV)
+              serviceConnectionName: $(serviceConnectionDV)
               environmentCode: ${{ environmentCode }}
               containerAppName: ${{ app.containerAppName }}
               acrAppName: ${{ app.acrAppName }}
               port: ${{ app.port }}
+              updateFirewall: ${{ parameters.updateACRFirewall }}
         - ${{ if eq(upper(environmentCode), 'TS') }}:
           - template: templates/aca-deploy-template.yml
             parameters:
-              serviceConnectionName: $(serviceConnectionNameTS)
+              serviceConnectionName: $(serviceConnectionTS)
               environmentCode: ${{ environmentCode }}
               containerAppName: ${{ app.containerAppName }}
               acrAppName: ${{ app.acrAppName }}
               port: ${{ app.port }}
+              updateFirewall: ${{ parameters.updateACRFirewall }}
         - ${{ if eq(upper(environmentCode), 'PD') }}:
           - template: templates/aca-deploy-template.yml
             parameters:
-              serviceConnectionName: $(serviceConnectionNamePD)
+              serviceConnectionName: $(serviceConnectionPD)
               environmentCode: ${{ environmentCode }}
               containerAppName: ${{ app.containerAppName }}
               acrAppName: ${{ app.acrAppName }}
               port: ${{ app.port }}
+              updateFirewall: ${{ parameters.updateACRFirewall }}
   
     # -- CREATE STAGE - Based on environment ----------------------------------------------------------
     - stage: Create${{ app.containerAppName }}${{ environmentCode }}
@@ -111,24 +114,27 @@ stages:
         - ${{ if eq(upper(environmentCode), 'DV') }}:
           - template: templates/aca-create-template.yml
             parameters:
-              serviceConnectionName: $(serviceConnectionNameDV)
+              serviceConnectionName: $(serviceConnectionDV)
               environmentCode: ${{ environmentCode }}
               containerAppName: ${{ app.containerAppName }}
               acrAppName: ${{ app.acrAppName }}
               port: ${{ app.port }}
+              updateFirewall: ${{ parameters.updateACRFirewall }}
         - ${{ if eq(upper(environmentCode), 'TS') }}:
           - template: templates/aca-create-template.yml
             parameters:
-              serviceConnectionName: $(serviceConnectionNameTS)
+              serviceConnectionName: $(serviceConnectionTS)
               environmentCode: ${{ environmentCode }}
               containerAppName: ${{ app.containerAppName }}
               acrAppName: ${{ app.acrAppName }}
               port: ${{ app.port }}
+              updateFirewall: ${{ parameters.updateACRFirewall }}
         - ${{ if eq(upper(environmentCode), 'PD') }}:
           - template: templates/aca-create-template.yml
             parameters:
-              serviceConnectionName: $(serviceConnectionNamePD)
+              serviceConnectionName: $(serviceConnectionPD)
               environmentCode: ${{ environmentCode }}
               containerAppName: ${{ app.containerAppName }}
               acrAppName: ${{ app.acrAppName }}
               port: ${{ app.port }}
+              updateFirewall: ${{ parameters.updateACRFirewall }}
