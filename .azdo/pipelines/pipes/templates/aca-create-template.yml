@@ -104,16 +104,14 @@ jobs:
             echo "##[endgroup]"
 
       # # ----------------------------------------------------------------------------------------------------
-      # # Add Login to ACR
+      # # ACR: Add FW rule and log in
       # # ----------------------------------------------------------------------------------------------------
       # - template: steps-container-registry-template.yml
       #   parameters:
-      #     action: 'login'
-      #     serviceConnectionName: $(serviceConnectionName)
+      #     action: 'add-login'
+      #     serviceConnectionName: ${{ parameters.serviceConnectionName }}
       #     registryName: $(containerRegistryName)
       #     registryResourceGroup: $(resourceGroupName)
-      #     imageName: $(imageName)
-      #     imageNameLatest: $(imageNameBranch)
       #     updateFirewall: ${{ parameters.updateFirewall }}
       #     agentIpAddress: $(agentIpAddress)
 
@@ -123,7 +121,7 @@ jobs:
       - task: AzureCLI@2
         displayName: Deploy Container App
         inputs:
-          AzureSubscription: $(serviceConnectionName)
+          AzureSubscription: ${{ parameters.serviceConnectionName }}
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
@@ -154,3 +152,15 @@ jobs:
               --max-replicas 1 \
               --ingress external \
               --container-name app
+
+      # # ----------------------------------------------------------------------------------------------------
+      # # ACR: Remove FW rule
+      # # ----------------------------------------------------------------------------------------------------
+      # - template: steps-container-registry-template.yml
+      #   parameters:
+      #     action: 'remove'
+      #     serviceConnectionName: ${{ parameters.serviceConnectionName }}
+      #     registryName: $(containerRegistryName)
+      #     registryResourceGroup: $(resourceGroupName)
+      #     updateFirewall: ${{ parameters.updateFirewall }}
+      #     agentIpAddress: $(agentIpAddress)
