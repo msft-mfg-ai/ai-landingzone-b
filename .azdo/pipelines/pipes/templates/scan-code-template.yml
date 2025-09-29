@@ -54,7 +54,7 @@ jobs:
           - ${{ if eq(lower(parameters.environmentCode), 'pd') }}:
               - template: ../../vars/var-pd.yml
         steps:
-          # Very basic simple example that might work sometimes...
+          # Very basic simple example that sometimes works...
           # - task: AdvancedSecurity-Codeql-Init@1
           #   inputs:
           #     languages: 'csharp'
@@ -103,6 +103,18 @@ jobs:
             #   codeqlpathstoinclude: $(appProjectFolderName)
             #   codeqlpathstoignore: $(workingDirectoryIgnore)
 
+          # You may be able to use autobuild, but I replaced it with specific build steps in this pipeline
+          # - ${{ if eq(lower(variables.appProjectExtension), 'csproj') }}:
+          #   - task: AdvancedSecurity-Codeql-Autobuild@1
+          #     displayName: GHAS AutoBuild
+          #     continueOnError: ${{ eq(parameters.continueOnScanError, 'true') }}
+
+          # If AutoBuild has failed, review the following troubleshooting steps.
+          # 1.  Verify that the language is set properly.
+          # 2.  Ensure that any configuration or dependencies are installed prior to the AutoBuild task.
+          # 3.  AutoBuild may not be suitable for your project. Replace the AutoBuild task in your pipeline with the normal build tasks
+          #     to build your project. This will give you more control over the build steps.
+
           - task: DotNetCoreCLI@2
             displayName: 'Restore project'
             inputs:
@@ -127,17 +139,6 @@ jobs:
           - task: AdvancedSecurity-Dependency-Scanning@1
             displayName: GHAS Dependency Scanning
             continueOnError: ${{ eq(parameters.continueOnScanError, 'true') }}
-
-            # If AutoBuild has failed, review the following troubleshooting steps.
-            # 1.  Verify that the language is set properly.
-            # 2.  Ensure that any configuration or dependencies are installed prior to the AutoBuild task.
-            # 3.  AutoBuild may not be suitable for your project. Replace the AutoBuild task in your pipeline with the normal build tasks
-            #     to build your project. This will give you more control over the build steps.
-            # I already built this in one of the previous steps, so I'm skipping this step.
-            # - ${{ if eq(lower(variables.appProjectExtension), 'csproj') }}:
-            #   - task: AdvancedSecurity-Codeql-Autobuild@1
-            #     displayName: GHAS AutoBuild
-            #     continueOnError: ${{ eq(parameters.continueOnScanError, 'true') }}
 
           - task: AdvancedSecurity-Codeql-Analyze@1
             displayName: GHAS Analyze
@@ -191,4 +192,51 @@ jobs:
 
           - task: MicrosoftSecurityDevOps@1
             displayName: 'Run Microsoft Security DevOps'
+            continueOnError: true
+
+          - script: |
+              echo "Installing additional security tools..."
+              pip install safety semgrep
+            displayName: 'Install Additional Security Tools'
+            continueOnError: true
+
+          - script: |
+              echo "Scanning for known vulnerabilities in dependencies..."
+              if [ -f "requirements.txt" ]; then
+                safety check -r requirements.txt --json --output safety-report.json || echo "Vulnerability scan completed with findings"
+                cat safety-report.json || echo "No safety report generated"
+              else
+                echo "No requirements.txt found, skipping dependency scan"
+              fi
+            displayName: 'Dependency Vulnerability Scan (Safety)'
+            continueOnError: true
+
+          - script: |
+              echo "Scanning for secrets and credentials..."
+              if find . -name "*.py" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" | head -1 > /dev/null; then
+                semgrep --config=auto --json --output=semgrep-report.json . || echo "Secret scan completed"
+                cat semgrep-report.json || echo "No semgrep report generated"
+              else
+                echo "No files found for secret scanning"
+              fi
+            displayName: 'Secrets and Code Quality Scan (Semgrep)'
+            continueOnError: true
+
+          - task: PublishTestResults@2
+            displayName: 'Publish Security Test Results'
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '**/security-*.xml'
+              mergeTestResults: true
+              testRunTitle: 'Security Scan Results'
+            condition: always()
+            continueOnError: true
+
+          - task: PublishBuildArtifacts@1
+            displayName: 'Publish Security Scan Reports (JSON)'
+            inputs:
+              pathToPublish: '$(System.DefaultWorkingDirectory)'
+              artifactName: 'security-reports'
+              publishLocation: 'Container'
+            condition: always ( )
             continueOnError: true

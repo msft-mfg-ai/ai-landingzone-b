@@ -30,8 +30,8 @@ parameters:
   displayName: Deploy Action
   type: string
   values:
-    - build-deploy
-    - create-build-deploy
+    - build-deploy          # builds the binary and deploys the image
+    - create-build-deploy   # creates the container app, then builds the binary and deploys the image
     - none
   default: 'build-deploy'
 - name: updateACRFirewall
@@ -50,16 +50,6 @@ variables:
 
 # ----------------------------------------------------------------------------------------------------
 stages:
-- ${{ if parameters.runMSDevSecOpsScan }}:
-    - stage: ScanApplication
-      displayName: Scan Application
-      jobs:
-        - template: pipes/templates/scan-code-template.yml
-          parameters:
-            environmentCode: 'DV'
-            runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
-            runGHASScan: false
-
 - ${{ if ne(parameters.deployToEnvironment, 'DV-TS-PD') }}:
   - template: pipes/build-deploy-app-pipe.yml
     parameters:
@@ -71,6 +61,8 @@ stages:
       apps: [ 
         { containerAppName: 'ui',  acrAppName: 'chatui',  projectFolderName: 'src/website/chatui', port: '8080' }
       ] 
+      runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
+      runGHASScan: false
 
 - ${{ if eq(parameters.deployToEnvironment, 'DV-TS-PD') }}:
   - template: pipes/build-deploy-app-pipe.yml
@@ -82,3 +74,5 @@ stages:
       apps: [ 
         { containerAppName: 'ui',  acrAppName: 'chatui',  projectFolderName: 'src/website/chatui', port: '8080' }
       ] 
+      runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
+      runGHASScan: false

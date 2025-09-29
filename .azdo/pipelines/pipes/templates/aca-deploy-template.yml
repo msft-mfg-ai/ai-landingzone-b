@@ -22,6 +22,9 @@ parameters:
   - name: acrFolderName
     default: 'appImages'
     type: string
+  - name: updateFirewall
+    default: true
+    type: boolean
 
 # ----------------------------------------------------------------------------------------------------
 jobs:
@@ -65,8 +68,8 @@ jobs:
             echo "##vso[task.setvariable variable=caAppName]$caAppName"
             $imageName="$($acrFolderNameLower)/$($acrAppNameLower):$(Build.BuildId)"
             echo "##vso[task.setvariable variable=imageName]$imageName"
-            $acrName="cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER)"
-            echo "##vso[task.setvariable variable=acrName]$acrName"
+            $containerRegistryName="cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER)"
+            echo "##vso[task.setvariable variable=containerRegistryName]$containerRegistryName"
             $containerRegistryUrl="cr$($appNameNoDashesLower)$($environmentCodeLower)$(INSTANCE_NUMBER).azurecr.io"
             echo "##vso[task.setvariable variable=containerRegistryUrl]$containerRegistryUrl"
 
@@ -82,7 +85,7 @@ jobs:
             echo "caAppName=$caAppName"
             echo "containerRegistryUrl=$containerRegistryUrl"
             echo "imageName=$imageName"
-            echo "acrName=$acrName"
+            echo "containerRegistryName=$containerRegistryName"
 
             echo "----------------------------------------"
             echo "##[group]Display All Environment Variables:"
@@ -99,23 +102,23 @@ jobs:
       #     scriptType: bash
       #     scriptLocation: inlineScript
       #     inlineScript: |
-      #       echo "Logging in to $(acrName)"
-      #       az acr login -n $(acrName)
+      #       echo "Logging in to $(containerRegistryName)"
+      #       az acr login -n $(containerRegistryName)
 
 
-      # ----------------------------------------------------------------------------------------------------
-      # Add Firewall rule to ACR for the build agent IP address and login
-      # ----------------------------------------------------------------------------------------------------
-      - template: steps-container-registry-template.yml
-        parameters:
-          action: 'add-login'
-          serviceConnectionName: $(serviceConnectionName)
-          registryName: $(containerRegistryName)
-          registryResourceGroup: $(resourceGroupName)
-          imageName: $(imageName)
-          imageNameLatest: $(imageNameBranch)
-          updateFirewall: ${{ parameters.updateFirewall }}
-          agentIpAddress: $(agentIpAddress)
+      # # ----------------------------------------------------------------------------------------------------
+      # # Add login to ACR
+      # # ----------------------------------------------------------------------------------------------------
+      # - template: steps-container-registry-template.yml
+      #   parameters:
+      #     action: 'login'
+      #     serviceConnectionName: $(serviceConnectionName)
+      #     registryName: $(containerRegistryName)
+      #     registryResourceGroup: $(resourceGroupName)
+      #     imageName: $(imageName)
+      #     imageNameLatest: $(imageNameBranch)
+      #     updateFirewall: ${{ parameters.updateFirewall }}
+      #     agentIpAddress: $(agentIpAddress)
 
       # ----------------------------------------------------------------------------------------------------
       # Deploy the container app image
@@ -127,23 +130,11 @@ jobs:
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
+            echo "Logging in to $(containerRegistryName)"
+            az acr login -n $(containerRegistryName)
+            
             az containerapp update \
               --name $(caAppName) \
               --resource-group $(resourceGroupName) \
               --image $(containerRegistryUrl)/$(imageName) \
               --container-name app
-
-      # ----------------------------------------------------------------------------------------------------
-      # Remove Firewall rule to ACR for the build agent IP address and login
-      # ----------------------------------------------------------------------------------------------------
-      - template: steps-container-registry-template.yml
-        parameters:
-          action: 'remove'
-          serviceConnectionName: $(serviceConnectionName)
-          registryName: $(containerRegistryName)
-          registryResourceGroup: $(resourceGroupName)
-          imageName: $(imageName)
-          imageNameLatest: $(imageNameBranch)
-          updateFirewall: ${{ parameters.updateFirewall }}
-          agentIpAddress: $(agentIpAddress)
-
