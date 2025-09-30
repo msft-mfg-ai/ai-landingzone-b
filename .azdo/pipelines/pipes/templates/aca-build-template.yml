@@ -117,7 +117,7 @@ jobs:
           workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.projectFolderName }}'
 
       # ----------------------------------------------------------------------------------------------------
-      # ACR Push: Push to ACR
+      # ACR Push: Push to ACR, add/remove firewall rules and remove if requested
       # ----------------------------------------------------------------------------------------------------
       - ${{ if parameters.pushToACR }}:
         - template: steps-container-registry-template.yml

@@ -2,6 +2,9 @@ using Microsoft.Extensions.Options;
 using Azure.AI.Agents.Persistent;
 using Azure.Identity;
 using chatui.Configuration;
+using chatui.Models;
+
+Console.WriteLine("Starting ChatUI... {0}", BuildInfo.Instance);
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +17,8 @@ builder.Services.AddOptions<ChatApiOptions>()
     .Bind(builder.Configuration.GetSection("AppSettings"))
     .ValidateDataAnnotations()
     .ValidateOnStart();
+
+Console.WriteLine("Chatting with Agent {0} at {1}", builder.Configuration["AppSettings:AppAgentId"], builder.Configuration["AppSettings:AppAgentEndpoint"]);
 
 builder.Services.AddSingleton((provider) =>
 {

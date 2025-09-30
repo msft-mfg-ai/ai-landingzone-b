@@ -6,10 +6,17 @@
     <UserSecretsId>46999c17-10e1-4982-80f9-e3fe894a6db1</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <Content Remove="Resources\buildinfo.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\buildinfo.json" />
+  </ItemGroup>
+  <ItemGroup>
     <Folder Include="wwwroot\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Azure.AI.Agents.Persistent" Version="1.1.0" />
     <PackageReference Include="Azure.Identity" Version="1.16.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 </Project>
