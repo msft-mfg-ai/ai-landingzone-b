@@ -7,6 +7,7 @@ param tags object = {}
 // Reference Resource params
 param logAnalyticsWorkspaceName string
 param logAnalyticsRgName string
+param appInsightsName string = ''
 param appSubnetId string = ''
 param publicAccessEnabled bool = true
 param containerAppEnvironmentWorkloadProfiles array
@@ -25,8 +26,15 @@ resource logAnalyticsResource 'Microsoft.OperationalInsights/workspaces@2025-02-
   scope: resourceGroup(logAnalyticsRgName)
 }
 
+resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
+  name: appInsightsName
+  scope: resourceGroup()
+}
+
 //var logAnalyticsKey = logAnalyticsResource.listKeys().primarySharedKey
 var logAnalyticsCustomerId = logAnalyticsResource.properties.customerId
+var appInsightsConnectionString = appInsights.properties.ConnectionString
+
 
 // App Environment
 resource existingAppEnvironmentResource 'Microsoft.App/managedEnvironments@2025-02-02-preview' existing = if (useExistingEnvironment) {
@@ -63,7 +71,9 @@ resource newAppEnvironmentResource 'Microsoft.App/managedEnvironments@2025-02-02
         ]
       }
     }
-    appInsightsConfiguration: {}
+    appInsightsConfiguration: {
+      connectionString: appInsightsConnectionString
+    }
     vnetConfiguration: !empty(appSubnetId) ? {
       infrastructureSubnetId: appSubnetId
       internal: !publicAccessEnabled

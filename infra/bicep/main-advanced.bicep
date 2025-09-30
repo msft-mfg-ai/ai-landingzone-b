@@ -1054,6 +1054,7 @@ module managedEnvironment './modules/app/managedEnvironment.bicep' = if (deployC
     location: location
     logAnalyticsWorkspaceName: logAnalytics.outputs.logAnalyticsWorkspaceName
     logAnalyticsRgName: resourceGroupName
+    appInsightsName: logAnalytics.outputs.applicationInsightsName
     appSubnetId: vnet.outputs.subnetAppSeResourceID
     tags: tags
     publicAccessEnabled: makeWebAppsPublic // before 08/15: publicAccessEnabled

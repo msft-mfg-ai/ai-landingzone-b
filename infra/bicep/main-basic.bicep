@@ -605,6 +605,7 @@ module managedEnvironment './modules/app/managedEnvironment.bicep' = if (deployC
     location: location
     logAnalyticsWorkspaceName: logAnalytics.outputs.logAnalyticsWorkspaceName
     logAnalyticsRgName: resourceGroupName
+    appInsightsName: logAnalytics.outputs.applicationInsightsName
     tags: tags
     publicAccessEnabled: makeWebAppsPublic // before 08/15: publicAccessEnabled
     containerAppEnvironmentWorkloadProfiles: containerAppEnvironmentWorkloadProfiles
