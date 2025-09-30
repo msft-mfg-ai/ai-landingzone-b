@@ -103,18 +103,6 @@ jobs:
             printenv | sort
             echo "##[endgroup]"
 
-      # # ----------------------------------------------------------------------------------------------------
-      # # ACR: Add FW rule and log in
-      # # ----------------------------------------------------------------------------------------------------
-      # - template: steps-container-registry-template.yml
-      #   parameters:
-      #     action: 'add-login'
-      #     serviceConnectionName: ${{ parameters.serviceConnectionName }}
-      #     registryName: $(containerRegistryName)
-      #     registryResourceGroup: $(resourceGroupName)
-      #     updateFirewall: ${{ parameters.updateFirewall }}
-      #     agentIpAddress: $(agentIpAddress)
-
       # ----------------------------------------------------------------------------------------------------
       # Deploy the container app image
       # ----------------------------------------------------------------------------------------------------
@@ -153,14 +141,3 @@ jobs:
               --ingress external \
               --container-name app
 
-      # # ----------------------------------------------------------------------------------------------------
-      # # ACR: Remove FW rule
-      # # ----------------------------------------------------------------------------------------------------
-      # - template: steps-container-registry-template.yml
-      #   parameters:
-      #     action: 'remove'
-      #     serviceConnectionName: ${{ parameters.serviceConnectionName }}
-      #     registryName: $(containerRegistryName)
-      #     registryResourceGroup: $(resourceGroupName)
-      #     updateFirewall: ${{ parameters.updateFirewall }}
-      #     agentIpAddress: $(agentIpAddress)

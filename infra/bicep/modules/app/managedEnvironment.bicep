@@ -7,6 +7,7 @@ param tags object = {}
 // Reference Resource params
 param logAnalyticsWorkspaceName string
 param logAnalyticsRgName string
+param appInsightsName string = ''
 param appSubnetId string = ''
 param publicAccessEnabled bool = true
 param containerAppEnvironmentWorkloadProfiles array
@@ -20,23 +21,30 @@ var resourceGroupName = resourceGroup().name
 
 // --------------------------------------------------------------------------------------------------------------
 // Reference Resource
-resource logAnalyticsResource 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
+resource logAnalyticsResource 'Microsoft.OperationalInsights/workspaces@2025-02-01' existing = {
   name: logAnalyticsWorkspaceName
   scope: resourceGroup(logAnalyticsRgName)
 }
 
+resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
+  name: appInsightsName
+  scope: resourceGroup()
+}
+
 //var logAnalyticsKey = logAnalyticsResource.listKeys().primarySharedKey
 var logAnalyticsCustomerId = logAnalyticsResource.properties.customerId
+var appInsightsConnectionString = appInsights.properties.ConnectionString
+
 
 // App Environment
-resource existingAppEnvironmentResource 'Microsoft.App/managedEnvironments@2024-03-01' existing = if (useExistingEnvironment) {
+resource existingAppEnvironmentResource 'Microsoft.App/managedEnvironments@2025-02-02-preview' existing = if (useExistingEnvironment) {
   name: existingEnvironmentName
   scope: resourceGroup(resourceGroupName)
 }
 
 // this key is internal to this file only, so security risk in  exposing it
 #disable-next-line secure-secrets-in-params // Secret is not passed in or out of this module
-resource newAppEnvironmentResource 'Microsoft.App/managedEnvironments@2024-03-01' = if (!useExistingEnvironment) {
+resource newAppEnvironmentResource 'Microsoft.App/managedEnvironments@2025-02-02-preview' = if (!useExistingEnvironment) {
   name: cleanAppEnvName
   location: location
   tags: tags
@@ -49,6 +57,22 @@ resource newAppEnvironmentResource 'Microsoft.App/managedEnvironments@2024-03-01
         sharedKey: logAnalyticsResource.listKeys().primarySharedKey
         //sharedKey: logAnalyticsKey
       }
+    }
+    openTelemetryConfiguration: {
+      tracesConfiguration: {
+        includeDapr: false
+        destinations: [
+          'appInsights'
+        ]
+      }
+      logsConfiguration: {
+        destinations: [
+          'appInsights'
+        ]
+      }
+    }
+    appInsightsConfiguration: {
+      connectionString: appInsightsConnectionString
     }
     vnetConfiguration: !empty(appSubnetId) ? {
       infrastructureSubnetId: appSubnetId

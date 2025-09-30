@@ -21,7 +21,7 @@ variables:
   - group: AI.LZ.Secrets
   - template: vars/var-service-connections.yml
   - name: resourceGroupName
-    value: rg-ai-docs-de
+    value: rg-ai-docs-dv
 
   # Bring in environment specific variable files
   - ${{ if eq(lower(parameters.runEnvironment), 'dv') }}:

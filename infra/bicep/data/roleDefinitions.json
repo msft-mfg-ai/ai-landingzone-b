@@ -21,14 +21,30 @@
     "serviceContributorRoleId": "7ca78c08-252a-4471-8644-bb5ff32d4ba0"
   },
   "openai": {
-    "cognitiveServicesOpenAIContributorRoleId": "a001fd3d-188f-4b5d-821b-7da978bf7442",
-    "cognitiveServicesOpenAIUserRoleId": "5e0bd9bd-7b93-4f28-af87-19fc36ad61bd",
-    "cognitiveServicesUserRoleId":"a97b65f3-24c7-4388-baec-2e87135dc908",
-    "cognitiveServicesContributorRoleId": "25fbc0a9-bd7c-42a3-aa1a-3b75d497ee68",
-    "cognitiveServicesAzureAIEngineerRoleId": "64702f94-c441-49e6-a78b-ef80e0188fee"
+    "cognitiveServicesAzureAIEngineerRoleId": "64702f94-c441-49e6-a78b-ef80e0188fee", // Azure AI Developer: Can perform all actions within an Azure AI resource besides managing the resource itself.
+    "cognitiveServicesOpenAIContributorRoleId": "a001fd3d-188f-4b5d-821b-7da978bf7442", // Full access including the ability to fine-tune, deploy and generate text
+    "cognitiveServicesOpenAIUserRoleId": "5e0bd9bd-7b93-4f28-af87-19fc36ad61bd", // Read access to view files, models, deployments. The ability to create completion and embedding calls.
+    "cognitiveServicesUserRoleId":"a97b65f3-24c7-4388-baec-2e87135dc908", // 	Lets you read and list keys of Cognitive Services.
+    "cognitiveServicesContributorRoleId": "25fbc0a9-bd7c-42a3-aa1a-3b75d497ee68", //  // Lets you create, read, update, delete and manage keys of Cognitive Services.
+    "cognitiveServicesDataReaderRoleId": "b59867f0-fa02-499b-be73-45a86b5b3e1c", // Lets you read Cognitive Services data.
+
+    "cognitiveServicesCustomVisionContributorRoleId": "c1ff6cc2-c111-46fe-8896-e0ef812ad9f3", // Full access to the project, including the ability to view, create, edit, or delete projects.
+    "cognitiveServicesCustomVisionDeploymentRoleId": "5c4089e1-6d96-4d2f-b296-c1bc7137275f", // Publish, unpublish or export models. Deployment can view the project but can't update.
+    "cognitiveServicesCustomVisionLabelerRoleId": "88424f51-ebe7-446f-bc41-7fa16989e96c", //  Vision Labeler	View, edit training images and create, add, remove, or delete the image tags. Can view project but can't update anything other than training images and tags.
+    "cognitiveServicesCustomVisionReaderRoleId": "93586559-c37d-4a6b-ba08-b9f0940c2d73", // Read-only actions in the project. Readers can't create or update the project.
+    "cognitiveServicesCustomVisionTrainerRoleId": "0a5ae4ab-0d65-4eeb-be61-29fc9b54394b", // View, edit projects and train the models, including the ability to publish, unpublish, export the models. Trainers can't create or delete the project.
+
+    "cognitiveServicesFaceRecognizerRoleId": "9894cab4-e18a-44aa-828b-cb588cd6f2d7", // 	Lets you perform detect, verify, identify, group, and find similar operations on Face API. No create or delete operations. Well suited for endpoints that only need inferencing capabilities
+    "cognitiveServicesImmersiveReaderUserRoleId": "b2de6794-95db-4659-8781-7e080d3f2b9d", // 	Provides access to create Immersive Reader sessions and call APIs
+    "cognitiveServicesLanguageOwnerRoleId": "f07febfe-79bc-46b1-8b37-790e26e6e498", // Has access to all Read, Test, Write, Deploy and Delete functions under Language portal
+    "cognitiveServicesLanguageReaderRoleId": "7628b7b8-a8b2-4cdc-b46f-e9b35248918e", // 	Has access to Read and Test functions under Language portal
+    "cognitiveServicesLanguageWriterRoleId": "f2310ca1-dc64-4889-bb49-c8e0fa3d47a8", // Has access to all Read, Test, and Write functions under Language Portal
+    "cognitiveServicesSpeechContributorRoleId": "0e75ca1e-0464-4b4d-8b93-68208a576181", // Full access to Speech projects, including read, write and delete all entities, for real-time speech recognition and batch transcription tasks, real-time speech synthesis and long audio tasks, custom speech and custom voice.
+    "cognitiveServicesSpeechUserRoleId": "f2dc8367-1007-4938-bd23-fe263f013447", // 	Access to the real-time speech recognition and batch transcription APIs, real-time speech synthesis and long audio APIs, as well as to read the data/test/model/endpoint for custom models, but can't create, delete or modify the data/test/model/endpoint for custom models.
+    "cognitiveServicesUsagesReaderRoleId": "bba48692-92b0-4667-a9ad-c31c7b334ac2" // Minimal permission to view Cognitive Services usages.
   },
   "ml": {
-    "dataScientistRole": "f6c7c914-8db3-469d-8ca1-694a8f32e121"
+    "dataScientistRoleId": "f6c7c914-8db3-469d-8ca1-694a8f32e121"
   },
   "containerregistry": {
     "acrPullRoleId": "7f951dda-4ed3-4680-a7ca-43fe172d538d"

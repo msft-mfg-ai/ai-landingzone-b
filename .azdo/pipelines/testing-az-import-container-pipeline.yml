@@ -30,7 +30,7 @@ variables:
   - template: vars/var-service-connections.yml
   # Bring in environment specific variable files
   - ${{ if eq(lower(parameters.runEnvironment), 'dv') }}:
-      - template: vars/var-dev.yml
+      - template: vars/var-dv.yml
   - ${{ if eq(lower(parameters.runEnvironment), 'ts') }}:
       - template: vars/var-ts.yml
   - ${{ if eq(lower(parameters.runEnvironment), 'pd') }}:
