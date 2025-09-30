@@ -41,7 +41,12 @@
     "cognitiveServicesLanguageWriterRoleId": "f2310ca1-dc64-4889-bb49-c8e0fa3d47a8", // Has access to all Read, Test, and Write functions under Language Portal
     "cognitiveServicesSpeechContributorRoleId": "0e75ca1e-0464-4b4d-8b93-68208a576181", // Full access to Speech projects, including read, write and delete all entities, for real-time speech recognition and batch transcription tasks, real-time speech synthesis and long audio tasks, custom speech and custom voice.
     "cognitiveServicesSpeechUserRoleId": "f2dc8367-1007-4938-bd23-fe263f013447", // 	Access to the real-time speech recognition and batch transcription APIs, real-time speech synthesis and long audio APIs, as well as to read the data/test/model/endpoint for custom models, but can't create, delete or modify the data/test/model/endpoint for custom models.
-    "cognitiveServicesUsagesReaderRoleId": "bba48692-92b0-4667-a9ad-c31c7b334ac2" // Minimal permission to view Cognitive Services usages.
+    "cognitiveServicesUsagesReaderRoleId": "bba48692-92b0-4667-a9ad-c31c7b334ac2", // Minimal permission to view Cognitive Services usages.
+
+    // Azure AI Foundry project roles  see https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/rbac-azure-ai-foundry
+    "cognitiveServicesAzureAIUser": "53ca6127-db72-4b80-b1b0-d745d6d5456d", // Grants reader access to AI projects, reader access to AI accounts, and data actions for an AI project.  
+    "cognitiveServicesAzureAIProjectManager": "eadc314b-1a2d-4efa-be10-5d325db5065e", // Lets you perform management actions on Azure AI Foundry projects, build and develop with projects, and conditionally assign the Azure AI User role to other user principals. 
+    "cognitiveServicesAzureAIAccountOwner": "e47c6f54-e4a2-4754-9501-8e0985b135e1" // Grants full access to manage AI projects and accounts, and lets you conditionally assign the Azure AI User role to other user principals. 
   },
   "ml": {
     "dataScientistRoleId": "f6c7c914-8db3-469d-8ca1-694a8f32e121"

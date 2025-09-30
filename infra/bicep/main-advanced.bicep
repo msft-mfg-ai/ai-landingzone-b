@@ -6,9 +6,9 @@
 // You can test before deploy it with this command (run these commands in the same directory as this bicep file):
 //   az deployment group what-if --resource-group rg_mfg-ai-lz --template-file 'main-advanced.bicep' --parameters environmentName=dev applicationName=aiapp applicationId=aiapp1 instanceNumber=002 regionCode=US
 // You can deploy it with this command:
-//   az deployment group create -n manual --resource-group rg_mfg-ai-lz --template-file 'main-advanced.bicep' --parameters environmentName=dev applicationName=aiapp applicationId=aiapp1 instanceNumber=002 regionCode=US
+//   az deployment group create -n "manual-$(Get-Date -Format \'yyyyMMdd-HHmmss\')" --resource-group rg_mfg-ai-lz --template-file 'main-advanced.bicep' --parameters environmentName=dev applicationName=aiapp applicationId=aiapp1 instanceNumber=002 regionCode=US
 // Or with a parameter file:
-//   az deployment group create -n manual --resource-group rg_mfg-ai-lz --template-file 'main-advanced.bicep' --parameters main-advanced.your.bicepparam
+//   az deployment group create -n "manual-$(Get-Date -Format \'yyyyMMdd-HHmmss\')" --resource-group rg_mfg-ai-lz --template-file 'main-advanced.bicep' --parameters main-advanced.your.bicepparam
 // --------------------------------------------------------------------------------------------------------------
 // 	Services Needed for Chat Agent Programs:
 // 		Container Apps

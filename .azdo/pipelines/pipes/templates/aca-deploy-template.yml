@@ -92,19 +92,6 @@ jobs:
             printenv | sort
             echo "##[endgroup]"
 
-      # # ----------------------------------------------------------------------------------------------------
-      # # Log into ACR
-      # # ----------------------------------------------------------------------------------------------------
-      # - task: AzureCLI@2
-      #   displayName: 'ACR: Docker Login'
-      #   inputs:
-      #     AzureSubscription: $(serviceConnectionName)
-      #     scriptType: bash
-      #     scriptLocation: inlineScript
-      #     inlineScript: |
-      #       echo "Logging in to $(containerRegistryName)"
-      #       az acr login -n $(containerRegistryName)
-
       # ----------------------------------------------------------------------------------------------------
       # Deploy the container app image
       # ----------------------------------------------------------------------------------------------------

@@ -57,21 +57,27 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.ENV_CODE  }}
     outputs:
-      IMAGE_NAME: ${{ steps.image-name.outputs.IMAGE_NAME }}
-      IMAGE_VERSION: ${{ steps.image-name.outputs.IMAGE_VERSION }}
+      IMAGE_NAME: ${{ steps.vars.outputs.IMAGE_NAME }}
+      IMAGE_VERSION: ${{ steps.vars.outputs.IMAGE_VERSION }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Get the current date
-        id: get-date
-        run: echo "TAG=$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
-
-      - name: Set image name
-        id: image-name
+      - name: Get the current date and repo name
+        id: vars
         run: |
-          IMAGE_VERSION="$(echo ${{ steps.get-date.outputs.TAG}} | tr '[:upper:]' '[:lower:]')"
+          echo "TAG=$(date +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
+          readonly rundatetime=$(date +'%Y-%m-%dT%H:%M:%SZ')
+          echo "rundatetime=$rundatetime" >> $GITHUB_OUTPUT
+          readonly rundate=$(date +'%Y.%m.%d')
+          echo "rundate=$rundate" >> $GITHUB_OUTPUT
+          readonly commitbranch=$(echo ${GITHUB_REF#refs/heads/})
+          echo "commitbranch=$commitbranch" >> $GITHUB_OUTPUT
+          readonly commitsha=${GITHUB_SHA::6}
+          echo "commitsha=$commitsha" >> $GITHUB_OUTPUT
+
+          IMAGE_VERSION="$(echo ${{ steps.vars.outputs.TAG}} | tr '[:upper:]' '[:lower:]')"
           echo "IMAGE_VERSION=$IMAGE_VERSION" >> $GITHUB_OUTPUT
           IMAGE_NAME="$(echo ${{ inputs.ACR_REPO_NAME }}/${{ inputs.ACR_APP_NAME }}:$IMAGE_VERSION | tr '[:upper:]' '[:lower:]')"
           echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_OUTPUT
@@ -86,8 +92,8 @@ jobs:
           echo "inputs.ACR_APP_NAME=${{ inputs.ACR_APP_NAME }}"
           echo "inputs.APP_PATH=${{ inputs.APP_PATH }}"
 
-          echo "steps.image-name.IMAGE_VERSION=${{ steps.image-name.outputs.IMAGE_VERSION }}"
-          echo "steps.image-name.IMAGE_NAME=${{ steps.image-name.outputs.IMAGE_NAME }}"
+          echo "steps.vars.IMAGE_VERSION=${{ steps.vars.outputs.IMAGE_VERSION }}"
+          echo "steps.vars.IMAGE_NAME=${{ steps.vars.outputs.IMAGE_NAME }}"
 
           echo "---------------------------------"
           echo "##[group]All Variables:"
@@ -106,6 +112,11 @@ jobs:
           tree -R ${{ github.workspace  }}
           echo "##[endgroup]"
         continue-on-error: true
+
+      - name: Put Build Details in buildinfo.json
+        shell: bash
+        run: |
+          echo -e -n "{\"buildDate\":\"${{ steps.vars.outputs.rundatetime }}\",\"buildNumber\":\"${{ steps.vars.outputs.rundate }}.${{ github.run_number }}\",\"buildId\":\"${{ github.run_id }}.${{ github.run_attempt }}\",\"imageTag\":\"${{ steps.vars.outputs.TAG}}\",\"run_id\":\"${{ github.run_id }}\",\"run_attempt\":\"${{ github.run_attempt }}\",\"run_number\":\"${{ github.run_number }}\",\"branchName\":\"${{ steps.vars.outputs.commitbranch }}\",\"commitHash\":\"${{ steps.vars.outputs.commitsha }}\"}" > ${{ github.workspace }}/${{ env.APP_PATH }}/Resources/buildinfo.json
 
       - name: Azure Login (Reusable Action)
         uses: ./.github/actions/login-action
@@ -141,12 +152,12 @@ jobs:
         if: ${{ inputs.PUSH_TO_ACR  && inputs.DOCKER_PUSH_TYPE == 'TASK' }}
         id: meta
         with:
-          images: ${{ inputs.ACR_NAME }}.azurecr.io/${{ steps.image-name.outputs.IMAGE_NAME_NO_TAG }}
+          images: ${{ inputs.ACR_NAME }}.azurecr.io/${{ steps.vars.outputs.IMAGE_NAME_NO_TAG }}
           labels: |
             org.opencontainers.image.title=AI Chat UI
             org.opencontainers.image.source=msft-mfg-ai.github.com
           tags: |
-            type=raw,enable=true,priority=200,prefix=,suffix=,value=${{ steps.get-date.outputs.TAG }}
+            type=raw,enable=true,priority=200,prefix=,suffix=,value=${{ steps.vars.outputs.TAG }}
             type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
@@ -166,7 +177,7 @@ jobs:
           build-args: |
             GIT_COMMIT=${{ github.sha }}
             GIT_BRANCH=${{ github.ref_name }}
-            APP_VERSION=${{ steps.image-name.outputs.IMAGE_NAME }}
+            APP_VERSION=${{ steps.vars.outputs.IMAGE_NAME }}
       # END -- Task Based Docker Push Commands ----------------------------------------------------------------------
 
       # -- Native Docker Push Commands ----------------------------------------------------------------------
@@ -175,15 +186,15 @@ jobs:
         id: docker-build
         working-directory: '${{ github.workspace }}/${{ inputs.APP_PATH }}'
         run: |
-            docker build . -t ${{ steps.image-name.outputs.IMAGE_NAME }}
+            docker build . -t ${{ steps.vars.outputs.IMAGE_NAME }}
             docker images
 
       - name: Native Docker Push
         if: ${{ inputs.PUSH_TO_ACR && inputs.DOCKER_PUSH_TYPE == 'NATIVE' }}
         working-directory: '${{ github.workspace }}/${{ inputs.APP_PATH }}'
         run: |
-            docker tag ${{ steps.image-name.outputs.IMAGE_NAME }} ${{ inputs.ACR_NAME }}.azurecr.io/${{ steps.image-name.outputs.IMAGE_NAME }}
-            docker push ${{ inputs.ACR_NAME }}.azurecr.io/${{ steps.image-name.outputs.IMAGE_NAME }}
+            docker tag ${{ steps.vars.outputs.IMAGE_NAME }} ${{ inputs.ACR_NAME }}.azurecr.io/${{ steps.vars.outputs.IMAGE_NAME }}
+            docker push ${{ inputs.ACR_NAME }}.azurecr.io/${{ steps.vars.outputs.IMAGE_NAME }}
       # END -- Native Docker Push Commands ----------------------------------------------------------------------
       
       - name: 'ACR: Remove Agent from FW'
@@ -199,6 +210,6 @@ jobs:
       #   with:
       #     context: '${{ github.workspace }}/${{ inputs.APP_PATH }}'
       #     push: true
-      #     tags: ${{ inputs.ACR_NAME }}.azurecr.io/${{ steps.image-name.outputs.IMAGE_NAME }}
+      #     tags: ${{ inputs.ACR_NAME }}.azurecr.io/${{ steps.vars.outputs.IMAGE_NAME }}
 
           

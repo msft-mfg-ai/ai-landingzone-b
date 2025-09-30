@@ -17,7 +17,7 @@ param regionCode string = 'US'
 @description('Instance number for the application, e.g. 001, 002, etc. This is used to differentiate multiple instances of the same application in the same environment.')
 @maxLength(3)
 @minLength(1)
-param instance string = '000'
+param instance string = '0'
 
 @description('Optional resource token to ensure uniqueness - leave blank if desired')
 param resourceToken string = ''
@@ -129,7 +129,7 @@ output project_vm object = {
   vm_os_disk_name:                           toLower('${resourceAbbreviations.computeDisks}-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}${dashProject}')
   vm_nsg_name:                               toLower('${resourceAbbreviations.networkNetworkSecurityGroups}-${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}${dashProject}')
   bastion_host_name:                         toLower('${resourceAbbreviations.networkBastionHosts}${sanitizedAppName}-${sanitizedEnvironment}${dashInstance}${dashProject}')
-  bastion_pip_name:                          toLower('${resourceAbbreviations.networkPublicIPAddresses}${sanitizedAppName}-${resourceAbbreviations.bastionPip}-${sanitizedEnvironment}${dashInstance}${dashInstance}${dashProject}')
+  bastion_pip_name:                          toLower('${resourceAbbreviations.networkPublicIPAddresses}${sanitizedAppName}-${resourceAbbreviations.bastionPip}-${sanitizedEnvironment}${dashInstance}${dashProject}')
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
