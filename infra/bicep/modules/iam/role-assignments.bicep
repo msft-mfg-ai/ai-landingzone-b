@@ -4,6 +4,9 @@
 // NOTE: this requires elevated permissions in the resource group
 // Contributor is not enough, you need Owner or User Access Administrator
 // ----------------------------------------------------------------------------------------------------
+// You can rerun this file from the infra/bicep folder with a command like this:
+//   az deployment group create -n "manual-identity-roles-$(Get-Date -Format \'yyyyMMdd-HHmmss\')" --resource-group rg_mfg-ai-lz --template-file 'modules/iam/role-assignments.bicep' --parameters identityPrincipalId=<UID-GUID> principalType=ServicePrincipal registryName=cr<APPNAME>dv1 storageAccountName=st<APPNAME>dv1 aiSearchName=srch-<APPNAME>-dv-1 aiServicesName=aif-<APPNAME>-dv-1 cosmosName=cosmos-<APPNAME>-dv-1 keyVaultName=kv<APPNAME>dv1
+// ----------------------------------------------------------------------------------------------------
 // For a list of Role Id's see https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles
 // ----------------------------------------------------------------------------------------------------
 
@@ -153,6 +156,16 @@ resource cognitiveServices_Role_AzureAIEngineer 'Microsoft.Authorization/roleAss
     description: 'Permission for ${principalType} ${identityPrincipalId} to be a Cognitive Services Azure AI Engineer'
   }
 }
+resource cognitiveServices_Role_AzureAIUser 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (addCogServicesRoles) {
+  name: guid(aiService.id, identityPrincipalId, roleDefinitions.openai.cognitiveServicesAzureAIUser)
+  scope: aiService
+  properties: {
+    principalId: identityPrincipalId
+    principalType: principalType
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', roleDefinitions.openai.cognitiveServicesAzureAIUser)
+    description: 'Permission for ${principalType} ${identityPrincipalId} to be a Cognitive Services Azure AI User'
+  }
+}
 resource cognitiveServices_Role_DataReader 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (addCogServicesRoles) {
   name: guid(aiService.id, identityPrincipalId, roleDefinitions.openai.cognitiveServicesDataReaderRoleId)
   scope: aiService
@@ -293,6 +306,8 @@ output cognitiveServicesRoleAssignmentIds object = (addCogServicesRoles) ? {
   cognitiveServices_User_RoleId : cognitiveServices_Role_User.id
   cognitiveServices_Contributor_RoleId : cognitiveServices_Role_Contributor.id
   cognitiveServices_AzureAIEngineer_RoleId : cognitiveServices_Role_AzureAIEngineer.id
+  cognitiveServices_AzureAIUser_RoleId: cognitiveServices_Role_AzureAIUser.id
+  cognitiveServices_DataReader_RoleId : cognitiveServices_Role_DataReader.id
 } : {}
 
 output searchServiceRoleAssignmentIds object = (addSearchRoles) ? {

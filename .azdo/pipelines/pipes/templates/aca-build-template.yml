@@ -43,6 +43,8 @@ jobs:
           - template: ../../vars/var-ts.yml
       - ${{ if eq(lower(parameters.environmentCode), 'pd') }}:
           - template: ../../vars/var-pd.yml
+      - name: buildInfoFileName
+        value: '$(System.DefaultWorkingDirectory)/${{ parameters.projectFolderName }}/Resources/buildinfo.json'
 
     steps:
       # ----------------------------------------------------------------------------------------------------
@@ -94,6 +96,7 @@ jobs:
             echo "agentIpAddress=$agentIpAddress"
             echo "workingDirectory=$(System.DefaultWorkingDirectory)/${{ parameters.projectFolderName }}"
             echo "serviceConnectionName=$(serviceConnectionName)"
+            echo "buildInfoFileName=$(buildInfoFileName)"
 
             echo "----------------------------------------"
             echo "##[group]Display All Environment Variables:"
@@ -104,6 +107,16 @@ jobs:
             echo "##[group]Directory of pipeline workspace:"
             tree -L 4 $(Pipeline.Workspace)
             echo "##[endgroup]"
+
+      # ----------------------------------------------------------------------------------------------------
+      # Store the build info in a file for the app to use
+      # ----------------------------------------------------------------------------------------------------
+      - task: CmdLine@2
+        displayName: "Put Build Details in buildinfo.json"
+        inputs:
+          script: |
+            echo {"buildDate":"$(runDateTime)","buildNumber":"$(Build.BuildNumber)","buildId":"$(Build.BuildId)","imageTag":"$(Build.BuildId)","branchName":"$(Build.SourceBranchName)","commitHash":"$(Build.SourceVersion)"} > $(buildInfoFileName)
+        continueOnError: true
 
       # ----------------------------------------------------------------------------------------------------
       # Build the image

@@ -2,7 +2,7 @@
 // Bicep file to deploy and identity
 // --------------------------------------------------------------------------------------------------------------
 // Test Deploy Command:
-//   az deployment group create -n manual-identity --resource-group rg-ai-docs-114-dev --template-file 'core/iam/identity.bicep' --parameters existingIdentityName='llaz114-app-id'
+//   az deployment group create -n "manual-identity-$(Get-Date -Format \'yyyyMMdd-HHmmss\')" --resource-group rg-ai-docs-114-dev --template-file 'core/iam/identity.bicep' --parameters existingIdentityName='llaz114-app-id'
 // --------------------------------------------------------------------------------------------------------------
 param identityName string = ''
 param existingIdentityName string  = ''
