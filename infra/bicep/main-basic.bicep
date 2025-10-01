@@ -119,8 +119,8 @@ param apimBaseUrl string = ''
 param apimAccessUrl string = ''
 @secure()
 param apimAccessKey string = ''
-@description('When set to true, UPN received from the authentication will be mocked to a fixed value')
-param mockUserUpn bool = false
+// @description('When set to true, UPN received from the authentication will be mocked to a fixed value')
+// param mockUserUpn bool = false
 
 // --------------------------------------------------------------------------------------------------------------
 // Existing images
@@ -149,6 +149,12 @@ param deployUIApp bool = false
 @description('Should we deploy a Document Intelligence?')
 param deployDocumentIntelligence bool = false
 
+@description('Add scripts to put a delay before the CAP Host deploy steps')
+param addCapHostDelayScripts bool = true
+
+@description('Name of existing Cosmos account to reuse?')
+param existingCosmosAccountName string = ''
+
 @description('Global Region where the resources will be deployed, e.g. AM (America), EM (EMEA), AP (APAC), CH (China)')
 param regionCode string = 'US'
 
@@ -161,10 +167,10 @@ param logRetentionInDays int = 365
 // --------------------------------------------------------------------------------------------------------------
 // Additional Tags that may be included or not
 // --------------------------------------------------------------------------------------------------------------
-param businessOwnerTag string = 'UNKNOWN'
-param applicationOwnerTag string = 'UNKNOWN'
 param createdByTag string = 'UNKNOWN'
-param costCenterTag string = 'UNKNOWN'
+// param businessOwnerTag string = 'UNKNOWN'
+// param applicationOwnerTag string = 'UNKNOWN'
+// param costCenterTag string = 'UNKNOWN'
 
 // --------------------------------------------------------------------------------------------------------------
 // A variable masquerading as a parameter to allow for dynamic value assignment in Bicep
@@ -187,9 +193,9 @@ var tags = {
   'created-by': createdByTag
   'application-name': applicationName
   'environment-name': environmentName
-  'application-owner': applicationOwnerTag
-  'business-owner': businessOwnerTag
-  'cost-center': costCenterTag
+  // 'application-owner': applicationOwnerTag
+  // 'business-owner': businessOwnerTag
+  // 'cost-center': costCenterTag
 }
 
 // Run a script to dedupe the KeyVault secrets -- this fails on private networks right now so turn if off for them
@@ -200,6 +206,9 @@ var deployEntraClientSecrets = !(empty(entraClientId) || empty(entraClientSecret
 
 var deployContainerRegistry = deployAPIApp || deployUIApp
 var deployCAEnvironment = deployAPIApp || deployUIApp
+
+// Should we deploy a Cosmos or reuse existing?
+var deployCosmos = !empty(existingCosmosAccountName) ? false : true
 
 // --------------------------------------------------------------------------------------------------------------
 // -- Generate Resource Names -----------------------------------------------------------------------------------
@@ -409,7 +418,8 @@ var sessionsContainerArray = [
 module cosmos './modules/database/cosmosdb.bicep' = {
   name: 'cosmos${deploymentSuffix}'
   params: {
-    accountName: resourceNames.outputs.cosmosName
+    accountName: deployCosmos ? resourceNames.outputs.cosmosName : ''
+    existingAccountName: deployCosmos ? '' : existingCosmosAccountName
     databaseName: uiDatabaseName
     sessionsDatabaseName: sessionsDatabaseName
     sessionContainerArray: sessionsContainerArray
@@ -567,6 +577,8 @@ module aiProject './modules/ai/ai-project-with-caphost.bicep' = {
     projectNo: 1
     createHubCapabilityHost: true   // this is required for non-vnet injected
     aiDependencies: aiDependencies
+    managedIdentityId: identity.outputs.managedIdentityId
+    addCapHostDelayScripts: addCapHostDelayScripts
   }
 }
 

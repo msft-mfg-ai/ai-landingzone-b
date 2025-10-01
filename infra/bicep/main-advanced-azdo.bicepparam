@@ -50,22 +50,24 @@ param makeWebAppsPublic = empty('#{makeWebAppsPublic}#') ? false : toLower('#{ma
 param existingVnetName = empty('#{EXISTING_VNET_NAME}#') ? null : '#{EXISTING_VNET_NAME}#'
 param existingVnetResourceGroupName = empty('#{EXISTING_VNET_RESOURCE_GROUP_NAME}#') ? null : '#{EXISTING_VNET_RESOURCE_GROUP_NAME}#'
 
+param existingCosmosAccountName = empty('#{EXISTING_COSMOS_ACCOUNT_NAME}#') ? null : '#{EXISTING_COSMOS_ACCOUNT_NAME}#'
+
 param vm_username = empty('#{VM_USERNAME}#') ? null : '#{VM_USERNAME}#' // This is the username for the admin user of jumpboxvm
 param vm_password = empty('#{VM_PASSWORD}#') ? null : '#{VM_PASSWORD}#' // This is the password for the admin user of jumpboxvm
 param vm_name = empty('#{VM_NAME}#') ? null : '#{VM_NAME}#' // optional Jumpbox VM name - otherwise created by resourceNames.bicep
 param myIpAddress = empty('#{MY_IP_ADDRESS}#') ? null : '#{MY_IP_ADDRESS}#'
 
 param deployAPIM = empty('#{deployAPIM}#') ? false : toLower('#{deployAPIM}#') == 'true'
-// Should we deploy the API Management service?
 param deployUIApp = empty('#{deployUIApp}#') ? false : toLower('#{deployUIApp}#') == 'true'
-// Should we deploy the UI app?
 param vnetPrefix = empty('#{VNET_PREFIX}#') ? null : '#{VNET_PREFIX}#'
+
+param addCapHostDelayScripts = empty('#{addCapHostDelayScripts}#') ? true : toLower('#{addCapHostDelayScripts}#') == 'true'
 
 // applications
 param uiImageName = empty('#{UI_IMAGE_NAME}#') ? null : '#{UI_IMAGE_NAME}#'
 
-// only for Microsoft internal deployments
-param mockUserUpn = empty('#{MOCK_USER_UPN}#') ? false : toLower('#{MOCK_USER_UPN}#') == 'true' // Mock user UPN for testing purposes
+// // only for Microsoft internal deployments
+// param mockUserUpn = empty('#{MOCK_USER_UPN}#') ? false : toLower('#{MOCK_USER_UPN}#') == 'true' // Mock user UPN for testing purposes
 
 // use consumption for non-customer deployments
 param containerAppEnvironmentWorkloadProfiles = [

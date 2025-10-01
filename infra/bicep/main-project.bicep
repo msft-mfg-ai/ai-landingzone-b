@@ -44,6 +44,8 @@ param publicAccessEnabled bool = false
 param appendResourceTokens bool = false
 @description('Create DNS Zones?')
 param createDnsZones bool = true
+@description('Add scripts to put a delay before the CAP Host deploy steps')
+param addCapHostDelayScripts bool = true
 
 // --------------------------------------------------------------------------------------------------------------
 // Virtual machine jumpbox
@@ -79,10 +81,10 @@ param runDateTime string = utcNow()
 // --------------------------------------------------------------------------------------------------------------
 // Additional Tags that may be included or not
 // --------------------------------------------------------------------------------------------------------------
-param businessOwnerTag string = 'UNKNOWN'
-param applicationOwnerTag string = 'UNKNOWN'
 param createdByTag string = 'UNKNOWN'
-param costCenterTag string = 'UNKNOWN'
+// param businessOwnerTag string = 'UNKNOWN'
+// param applicationOwnerTag string = 'UNKNOWN'
+// param costCenterTag string = 'UNKNOWN'
 
 // --------------------------------------------------------------------------------------------------------------
 // -- Variables -------------------------------------------------------------------------------------------------
@@ -95,9 +97,9 @@ var tags = {
   'creation-date': take(runDateTime, 8)
   'created-by': createdByTag
   'environment-name': environmentName
-  'application-owner': applicationOwnerTag
-  'business-owner': businessOwnerTag
-  'cost-center': costCenterTag
+  // 'application-owner': applicationOwnerTag
+  // 'business-owner': businessOwnerTag
+  // 'cost-center': costCenterTag
 }
 
 var deployVirtualMachine = !empty(vm_username) && !empty(vm_password)
@@ -341,6 +343,8 @@ module aiProject1 './modules/ai/ai-project-with-caphost.bicep' = {
     location: location
     projectNo: projectNumber
     aiDependencies: aiDependecies
+    managedIdentityId: identity.outputs.managedIdentityId
+    addCapHostDelayScripts: addCapHostDelayScripts
   }
   dependsOn: [allDnsZones]
 }
