@@ -38,7 +38,7 @@ This reference implementation deploys an AI Landing Zone for Azure OpenAI, which
 
 ## Additional Documentation
 
-TBD - coming soon...!
+[Additional Learning Resources](./docs/Learning_Guide.md)
 
 ---
 
