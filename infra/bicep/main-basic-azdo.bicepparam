@@ -46,12 +46,16 @@ param addRoleAssignments = empty('#{addRoleAssignments}#') ? false : toLower('#{
 param publicAccessEnabled = true
 param makeWebAppsPublic = true
 
+param existingCosmosAccountName = empty('#{EXISTING_COSMOS_ACCOUNT_NAME}#') ? null : '#{EXISTING_COSMOS_ACCOUNT_NAME}#'
+
 param deployAPIM = empty('#{deployAPIM}#') ? false : toLower('#{deployAPIM}#') == 'true'
 param deployUIApp = empty('#{deployUIApp}#') ? false : toLower('#{deployUIApp}#') == 'true'
 param uiImageName = empty('#{UI_IMAGE_NAME}#') ? null : '#{UI_IMAGE_NAME}#'
 
-// only for Microsoft internal deployments
-param mockUserUpn = empty('#{MOCK_USER_UPN}#') ? false : toLower('#{MOCK_USER_UPN}#') == 'true' // Mock user UPN for testing purposes
+param addCapHostDelayScripts = empty('#{addCapHostDelayScripts}#') ? true : toLower('#{addCapHostDelayScripts}#') == 'true'
+
+// // only for Microsoft internal deployments
+// param mockUserUpn = empty('#{MOCK_USER_UPN}#') ? false : toLower('#{MOCK_USER_UPN}#') == 'true' // Mock user UPN for testing purposes
 
 // use consumption for non-customer deployments
 param containerAppEnvironmentWorkloadProfiles = [

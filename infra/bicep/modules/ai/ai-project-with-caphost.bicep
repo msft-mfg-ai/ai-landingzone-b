@@ -5,7 +5,8 @@ param aiDependencies types.aiDependenciesType
 param location string
 param foundryName string
 param createHubCapabilityHost bool = false
-// param managedIdentityId string = ''
+param managedIdentityId string = ''
+param addCapHostDelayScripts bool = true
 
 @description('The number of the AI project to create')
 @minValue(1)
@@ -24,7 +25,7 @@ module aiProject './ai-project.bicep' = {
     projectName: 'ai-project-${projectNo}'
     projectDescription: 'AI Project ${projectNo}'
     displayName: 'AI Project ${projectNo}'
-    // managedIdentityId: null // Use System Assigned Identity
+    managedIdentityId: null // Use System Assigned Identity
 
     aiSearchName: aiDependencies.aiSearch.name
     aiSearchServiceResourceGroupName: aiDependencies.aiSearch.resourceGroupName
@@ -58,7 +59,8 @@ module waitForProjectScript 'waitDeploymentScript.bicep' = {
     name: 'script-wait-proj-${projectNo}'
     location: location
     seconds: 90
-    // userManagedIdentityId: managedIdentityId
+    userManagedIdentityId: managedIdentityId
+    addCapHostDelayScripts: addCapHostDelayScripts
   }
 }
 
@@ -135,7 +137,8 @@ module waitForConnectionsScript 'waitDeploymentScript.bicep' = {
     name: 'script-wait-connections-${projectNo}'
     location: location
     seconds: 90
-    // userManagedIdentityId: managedIdentityId
+    userManagedIdentityId: managedIdentityId
+    addCapHostDelayScripts: addCapHostDelayScripts
   }
 }
 

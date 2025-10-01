@@ -17,7 +17,7 @@ resource getKeyVaultSecretNames 'Microsoft.Resources/deploymentScripts@2023-08-0
     userAssignedIdentities: { '${ userManagedIdentityId }': {} }
   }
   properties: {
-    azPowerShellVersion: '8.1'
+    azPowerShellVersion: '11.0'
     forceUpdateTag: utcValue
     retentionInterval: 'PT1H'
     timeout: 'PT5M'
