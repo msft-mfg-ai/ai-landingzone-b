@@ -21,7 +21,7 @@ public class ChatController(
         if (string.IsNullOrWhiteSpace(prompt))
             throw new ArgumentException("Prompt cannot be null, empty, or whitespace.", nameof(prompt));
 
-        _logger.LogInformation($"API: Starting Completions: Thread: {threadId}  Prompt: {prompt}");
+        _logger.LogInformation($"API Completions: Starting... Thread: {threadId}  Prompt: {prompt}");
         try
         {
             var _config = _options.CurrentValue;
@@ -52,14 +52,14 @@ public class ChatController(
         }
         catch (RequestFailedException ex)
         {
-            _logger.LogError($"API: Error in Completions: Thread: {threadId} Prompt: {prompt} - Error: {ex.Message}");
+            _logger.LogError($"API Completions: Error: Thread: {threadId} Prompt: {prompt} - Error: {ex.Message}");
             return StatusCode(ex.Status, new { error = ex.Message });
         }
     }
     [HttpPost]
     public async Task<IActionResult> Threads()
     {
-        _logger.LogInformation($"API: Starting Threads...");
+        _logger.LogInformation($"API Threads: Starting ...");
         try
         {
             // TODO [performance efficiency] Delay creating a thread until the first user message arrives.
@@ -69,23 +69,23 @@ public class ChatController(
         }
         catch (RequestFailedException ex)
         {
-            _logger.LogError($"API: Error in Threads: {ex.Message}");
+            _logger.LogError($"API Threads: Error: {ex.Message}");
             return StatusCode(ex.Status, new { error = ex.Message });
         }
     }
     [HttpGet]
     public async Task<IActionResult> Info()
     {
-        _logger.LogInformation($"API: Starting Info...");
+        _logger.LogInformation($"API Info: Starting...");
         _ = await Task.FromResult(true);
         try
         {
-
+            _logger.LogInformation($"API Info: Build Number: {BuildInfo.Instance.BuildNumber} Date: {BuildInfo.Instance.BuildDate}");
             return Ok(new { data = BuildInfo.Instance });
         }
         catch (Exception ex)
         {
-            _logger.LogError($"API: Error in Info: {ex.Message}");
+            _logger.LogError($"API Info: Error: {ex.Message}");
             return StatusCode(500, new { error = ex.Message });
         }
     }

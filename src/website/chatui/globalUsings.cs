@@ -1,7 +1,11 @@
-﻿global using Microsoft.AspNetCore.Mvc;
-global using Microsoft.Extensions.Options;
-global using Azure;
+﻿global using Azure;
+global using Azure.Core;
 global using Azure.AI.Agents.Persistent;
+global using Azure.Identity;
 global using chatui.Configuration;
-global using Newtonsoft.Json;
 global using chatui.Models;
+global using chatui.Extensions;
+global using Microsoft.AspNetCore.DataProtection;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.Extensions.Options;
+global using Newtonsoft.Json;
