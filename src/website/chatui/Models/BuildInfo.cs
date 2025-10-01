@@ -1,8 +1,4 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
-
-using Newtonsoft.Json;
-
-namespace chatui.Models;
+﻿namespace chatui.Models;
 
 /// <summary>
 /// Build Info
@@ -75,7 +71,7 @@ public class BuildInfo
         BuildId = buildId;
         BranchName = branchName;
         CommitHash = commitHash;
-        ImageTag = ImageTag;
+        ImageTag = imageTag;
     }
 
     private static BuildInfo Create()
@@ -85,7 +81,7 @@ public class BuildInfo
             var assembly = typeof(BuildInfo).Assembly!;
             string resourceName = assembly.GetManifestResourceNames().Single(str => str.EndsWith("buildinfo.json"));
             using Stream stream = assembly.GetManifestResourceStream(resourceName)!;
-            using StreamReader reader = new StreamReader(stream);
+            using StreamReader reader = new(stream);
             var json = reader.ReadToEnd();
 
             var buildInfo = JsonConvert.DeserializeObject<BuildInfo>(json);

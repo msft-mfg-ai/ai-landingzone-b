@@ -172,14 +172,20 @@
   </style>
 
   <script type="text/javascript">
-    const BOT_NAME = "Chatbot";
+    const BOT_NAME = "Agent";
+    const SYSTEM_NAME = "System";
     const PERSON_NAME = "";
 
     document.addEventListener("DOMContentLoaded", async () => {
         const chatForm = document.querySelector(".msger-inputarea");
         const chatContainer = document.querySelector(".msger-chat");
         const messageInput = chatForm?.elements?.message;
+        const buildInfoSpan = document.getElementById("buildinfo");
 
+        var info  = await getInfo();
+        buildInfoSpan.textContent = "Build Number: " + info?.data?.buildNumber + "  Date: " + info?.data?.buildDate;
+
+        addChatMessage(SYSTEM_NAME, "left", "Connecting you to the next available agent... please wait...");
         const { id } = await createThread();
         const threadId = id;
 
@@ -227,11 +233,27 @@
 
             if (!response.ok) {
                 const errorMessage = await response.text().catch(() => response.statusText);
+                addChatMessage(SYSTEM_NAME, "left", "Error starting conversation with agent...!");
                 throw new Error(`Error creating session: ${errorMessage}`);
             }
 
             return response.json();
         }
+
+        async function getInfo() {
+            const response = await fetch("/chat/info", {
+                method: "GET",
+                headers: { "Content-Type": "application/json" }
+            });
+
+            if (!response.ok) {
+                const errorMessage = await response.text().catch(() => response.statusText);
+                addChatMessage(SYSTEM_NAME, "left", "Error getting info...!");
+                throw new Error(`Error getting info: ${errorMessage}`);
+            }
+            return response.json();
+        }
+
 
         function addChatMessage(name, side, text) {
             const timestamp = formatTime(new Date());
@@ -272,6 +294,7 @@
         <i class="fas fa-comment-alt" aria-hidden="true"></i>
         <span>Chat with your agent</span>
       </h1>
+      <span id="buildinfo" style="font-size: 0.8em"></span>
     </header>
 
     <main class="msger-chat" aria-live="polite" role="log">

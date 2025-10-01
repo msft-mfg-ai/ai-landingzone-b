@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Azure;
-using Azure.AI.Agents.Persistent;
-using chatui.Configuration;
-
-namespace chatui.Controllers;
+﻿namespace chatui.API;
 
 [ApiController]
 [Route("[controller]/[action]")]
@@ -27,7 +21,7 @@ public class ChatController(
         if (string.IsNullOrWhiteSpace(prompt))
             throw new ArgumentException("Prompt cannot be null, empty, or whitespace.", nameof(prompt));
 
-        _logger.LogInformation($"API: Completions for thread {threadId} - Prompt {prompt}");)
+        _logger.LogInformation($"API: Starting Completions: Thread: {threadId}  Prompt: {prompt}");
         try
         {
             var _config = _options.CurrentValue;
@@ -58,14 +52,14 @@ public class ChatController(
         }
         catch (RequestFailedException ex)
         {
-            _logger.LogError($"API: Completions for thread {threadId} Prompt: {prompt} - Error {ex.Message}");
+            _logger.LogError($"API: Error in Completions: Thread: {threadId} Prompt: {prompt} - Error: {ex.Message}");
             return StatusCode(ex.Status, new { error = ex.Message });
         }
     }
     [HttpPost]
     public async Task<IActionResult> Threads()
     {
-        _logger.LogInformation($"API: Creating thread...");
+        _logger.LogInformation($"API: Starting Threads...");
         try
         {
             // TODO [performance efficiency] Delay creating a thread until the first user message arrives.
@@ -75,8 +69,24 @@ public class ChatController(
         }
         catch (RequestFailedException ex)
         {
-            _logger.LogError($"API: Creating thread - Error {ex.Message}");
+            _logger.LogError($"API: Error in Threads: {ex.Message}");
             return StatusCode(ex.Status, new { error = ex.Message });
+        }
+    }
+    [HttpGet]
+    public async Task<IActionResult> Info()
+    {
+        _logger.LogInformation($"API: Starting Info...");
+        _ = await Task.FromResult(true);
+        try
+        {
+
+            return Ok(new { data = BuildInfo.Instance });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"API: Error in Info: {ex.Message}");
+            return StatusCode(500, new { error = ex.Message });
         }
     }
 }

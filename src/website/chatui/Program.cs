@@ -63,4 +63,6 @@ app.MapControllerRoute(
 
 app.UseCors("AllowAllOrigins");
 
+Console.WriteLine("Running ChatUI... {0}", BuildInfo.Instance);
+
 app.Run();

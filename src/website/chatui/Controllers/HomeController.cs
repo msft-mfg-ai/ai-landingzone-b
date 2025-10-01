@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using chatui.Models;
 
 namespace chatui.Controllers;
 
