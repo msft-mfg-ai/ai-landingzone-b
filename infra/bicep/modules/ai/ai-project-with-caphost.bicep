@@ -5,7 +5,7 @@ param aiDependencies types.aiDependenciesType
 param location string
 param foundryName string
 param createHubCapabilityHost bool = false
-param managedIdentityId string = ''
+// param managedIdentityId string = ''
 
 @description('The number of the AI project to create')
 @minValue(1)
@@ -24,7 +24,7 @@ module aiProject './ai-project.bicep' = {
     projectName: 'ai-project-${projectNo}'
     projectDescription: 'AI Project ${projectNo}'
     displayName: 'AI Project ${projectNo}'
-    managedIdentityId: null // Use System Assigned Identity
+    // managedIdentityId: null // Use System Assigned Identity
 
     aiSearchName: aiDependencies.aiSearch.name
     aiSearchServiceResourceGroupName: aiDependencies.aiSearch.resourceGroupName
@@ -41,6 +41,16 @@ module aiProject './ai-project.bicep' = {
 }
 
 // NOTE: using a wait script to ensure the project is fully deployed before proceeding with role assignments and connections
+// // this br/public:deployment-scripts/wait module has been deprecated...
+// module waitForProjectScript 'br/public:deployment-scripts/wait:1.1.1' = {
+//   name: 'waitForProjectScript-${projectNo}'
+//   dependsOn: [aiProject]
+//   params: {
+//     waitSeconds: 90
+//     location: resourceGroup().location
+//   }
+// }
+// fails because it's trying to use key based access to the storage account
 module waitForProjectScript 'waitDeploymentScript.bicep' = {
   name: 'waitForProjectScript-${projectNo}'
   dependsOn: [aiProject]
@@ -48,7 +58,7 @@ module waitForProjectScript 'waitDeploymentScript.bicep' = {
     name: 'script-wait-proj-${projectNo}'
     location: location
     seconds: 90
-    userManagedIdentityId: managedIdentityId
+    // userManagedIdentityId: managedIdentityId
   }
 }
 
@@ -108,6 +118,16 @@ module addProjectCapabilityHost 'add-project-capability-host.bicep' = {
 }
 
 // NOTE: using a wait script to ensure all connections are established before finishing the capability host
+// this br/public:deployment-scripts/wait module has been deprecated...
+// module waitForConnectionsScript 'br/public:deployment-scripts/wait:1.1.1' = {
+//   name:  'waitForConnectionsScript-${projectNo}'
+//   dependsOn: [addProjectCapabilityHost]
+//   params: {
+//     waitSeconds: 90
+//     location: resourceGroup().location
+//   }
+// }
+// but this fails because it's trying to use key based access to the storage account
 module waitForConnectionsScript 'waitDeploymentScript.bicep' = {
   name: 'waitForConnectionsScript-${projectNo}'
   dependsOn: [addProjectCapabilityHost]
@@ -115,7 +135,7 @@ module waitForConnectionsScript 'waitDeploymentScript.bicep' = {
     name: 'script-wait-connections-${projectNo}'
     location: location
     seconds: 90
-    userManagedIdentityId: managedIdentityId
+    // userManagedIdentityId: managedIdentityId
   }
 }
 

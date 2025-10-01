@@ -9,16 +9,16 @@ param seconds int
 
 param utcValue string = utcNow()
 
-param userManagedIdentityId string = ''
+//param userManagedIdentityId string = ''
 
 resource waitScript 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
   name: name
   location: location
   kind: 'AzurePowerShell'
-  identity: {
-    type: 'UserAssigned'
-    userAssignedIdentities: { '${ userManagedIdentityId }': {} }
-  }
+  // identity: {
+  //   type: 'UserAssigned'
+  //   userAssignedIdentities: { '${ userManagedIdentityId }': {} }
+  // }
   properties: {
     azPowerShellVersion: '11.0'
     forceUpdateTag: utcValue
