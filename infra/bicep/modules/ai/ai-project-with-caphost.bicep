@@ -39,7 +39,6 @@ module aiProject './ai-project.bicep' = {
   }
 }
 
-
 module formatProjectWorkspaceId './format-project-workspace-id.bicep' = {
   name: 'format-project-${projectNo}-workspace-id-deployment'
   params: {
@@ -48,7 +47,6 @@ module formatProjectWorkspaceId './format-project-workspace-id.bicep' = {
 }
 
 //Assigns the project SMI the storage blob data contributor role on the storage account
-
 module storageAccountRoleAssignment '../iam/azure-storage-account-role-assignment.bicep' = {
   name: 'storage-role-assignment-deployment-${projectNo}'
   scope: resourceGroup(aiDependencies.azureStorage.resourceGroupName)
@@ -78,6 +76,19 @@ module aiSearchRoleAssignments '../iam/ai-search-role-assignments.bicep' = {
   }
 }
 
+module delayDeployment 'br/public:deployment-scripts/wait:1.1.1' = {
+  name: 'delayDeployment'
+  params: {
+    waitSeconds: 180
+  }
+  dependsOn: [
+    cosmosAccountRoleAssignments
+    storageAccountRoleAssignment
+    aiSearchRoleAssignments
+    aiProject
+  ]
+}
+
 // This module creates the capability host for the project and account
 module addProjectCapabilityHost 'add-project-capability-host.bicep' = {
   name: 'capabilityHost-configuration-deployment-${projectNo}'
@@ -90,9 +101,10 @@ module addProjectCapabilityHost 'add-project-capability-host.bicep' = {
     aiFoundryConnectionName: aiProject.outputs.aiFoundryConnectionName
   }
   dependsOn: [
-     cosmosAccountRoleAssignments
-     storageAccountRoleAssignment
-     aiSearchRoleAssignments
+    //  cosmosAccountRoleAssignments
+    //  storageAccountRoleAssignment
+    //  aiSearchRoleAssignments
+     delayDeployment
   ]
 }
 

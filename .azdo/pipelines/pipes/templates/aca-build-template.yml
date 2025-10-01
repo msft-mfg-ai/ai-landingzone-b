@@ -64,6 +64,11 @@ jobs:
             $appNameNoDashesLower="$(APP_NAME)".ToLower().Replace("-", "")
             echo "##vso[task.setvariable variable=appNameNoDashesLower]$appNameNoDashesLower"
 
+            $runDateTime=(Get-Date).ToString("yyyyMMdd-HHmmss")
+            echo "##vso[task.setvariable variable=runDateTime]$runDateTime"
+            $runDateTimeZ=(Get-Date).ToString("yyyyMMddTHHmmss")+"Z"
+            echo "##vso[task.setvariable variable=runDateTimeZ]$runDateTimeZ"
+
             $resourceGroupName="$(RESOURCEGROUP_PREFIX)-$environmentCodeLower-$(INSTANCE_NUMBER)".ToLower()
             echo "##vso[task.setvariable variable=resourceGroupName]$resourceGroupName"
             
