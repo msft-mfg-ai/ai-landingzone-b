@@ -5,6 +5,7 @@ param aiDependencies types.aiDependenciesType
 param location string
 param foundryName string
 param createHubCapabilityHost bool = false
+param managedIdentityId string = ''
 
 @description('The number of the AI project to create')
 @minValue(1)
@@ -47,6 +48,7 @@ module waitForProjectScript 'waitDeploymentScript.bicep' = {
     name: 'script-wait-proj-${projectNo}'
     location: location
     seconds: 90
+    userManagedIdentityId: managedIdentityId
   }
 }
 
@@ -113,6 +115,7 @@ module waitForConnectionsScript 'waitDeploymentScript.bicep' = {
     name: 'script-wait-connections-${projectNo}'
     location: location
     seconds: 90
+    userManagedIdentityId: managedIdentityId
   }
 }
 

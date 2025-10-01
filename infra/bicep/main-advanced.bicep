@@ -713,6 +713,7 @@ module aiProject './modules/ai/ai-project-with-caphost.bicep' = {
     location: location
     projectNo: 1
     aiDependencies: aiDependencies
+    managedIdentityId: identity.outputs.managedIdentityId
   }
 }
 
