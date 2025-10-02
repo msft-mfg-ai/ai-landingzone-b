@@ -176,6 +176,36 @@ resource cognitiveServices_Role_DataReader 'Microsoft.Authorization/roleAssignme
     description: 'Permission for ${principalType} ${identityPrincipalId} to be a Cognitive Services Data Reader'
   }
 }
+resource cognitiveServicesDataContributorRoleId 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (addCogServicesRoles) {
+  name: guid(aiService.id, identityPrincipalId, roleDefinitions.openai.cognitiveServicesDataContributorRoleId)
+  scope: aiService
+  properties: {
+    principalId: identityPrincipalId
+    principalType: principalType
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', roleDefinitions.openai.cognitiveServicesDataContributorRoleId)
+    description: 'Permission for ${principalType} ${identityPrincipalId} to be a Cognitive Services Data Contributor'
+  }
+}
+resource cognitiveServicesAzureAIProjectManagerRoleId 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (addCogServicesRoles) {
+  name: guid(aiService.id, identityPrincipalId, roleDefinitions.openai.cognitiveServicesAzureAIProjectManager)
+  scope: aiService
+  properties: {
+    principalId: identityPrincipalId
+    principalType: principalType
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', roleDefinitions.openai.cognitiveServicesAzureAIProjectManager)
+    description: 'Permission for ${principalType} ${identityPrincipalId} to be a Cognitive Services Azure AI Project Manager'
+  }
+}
+resource cognitiveServicesAzureAIAccountOwnerRoleId 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (addCogServicesRoles) {
+  name: guid(aiService.id, identityPrincipalId, roleDefinitions.openai.cognitiveServicesAzureAIAccountOwner)
+  scope: aiService
+  properties: {
+    principalId: identityPrincipalId
+    principalType: principalType
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', roleDefinitions.openai.cognitiveServicesAzureAIAccountOwner)
+    description: 'Permission for ${principalType} ${identityPrincipalId} to be a Cognitive Services Azure AI Account Owner'
+  }
+}
 
 // ----------------------------------------------------------------------------------------------------
 // Search Roles

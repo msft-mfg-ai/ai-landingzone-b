@@ -27,6 +27,7 @@
     "cognitiveServicesUserRoleId":"a97b65f3-24c7-4388-baec-2e87135dc908", // 	Lets you read and list keys of Cognitive Services.
     "cognitiveServicesContributorRoleId": "25fbc0a9-bd7c-42a3-aa1a-3b75d497ee68", //  // Lets you create, read, update, delete and manage keys of Cognitive Services.
     "cognitiveServicesDataReaderRoleId": "b59867f0-fa02-499b-be73-45a86b5b3e1c", // Lets you read Cognitive Services data.
+    "cognitiveServicesDataContributorRoleId": "19c28022-e58e-450d-a464-0b2a53034789", // (PREVIEW!) Allows to call data plane APIs, but not any control plane APIs for Microsoft Cognitive Services. This role is in preview and subject to change.
 
     "cognitiveServicesCustomVisionContributorRoleId": "c1ff6cc2-c111-46fe-8896-e0ef812ad9f3", // Full access to the project, including the ability to view, create, edit, or delete projects.
     "cognitiveServicesCustomVisionDeploymentRoleId": "5c4089e1-6d96-4d2f-b296-c1bc7137275f", // Publish, unpublish or export models. Deployment can view the project but can't update.

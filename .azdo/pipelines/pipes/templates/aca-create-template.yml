@@ -128,10 +128,10 @@ jobs:
                 AppSettings__AppAgentEndpoint="$(APP_AGENT_ENDPOINT)" \
                 AppSettings__AppAgentId="$(APP_AGENT_ID)" \
                 AppSettings__APPLICATIONINSIGHTS_CONNECTION_STRING="$(APP_APPINSIGHTS_CONNECTION_STRING)" \
-                AppSettings__AZURE_CLIENT_ID="$(APP_IDENTITY_PRINCIPAL_ID)" \
-                AppSettings__UserAssignedManagedIdentityClientId="$(APP_IDENTITY_PRINCIPAL_ID)" \
+                AppSettings__AZURE_CLIENT_ID="$(APP_IDENTITY_CLIENT_ID)" \
+                AppSettings__UserAssignedManagedIdentityClientId="$(APP_IDENTITY_CLIENT_ID)" \
                 APPLICATIONINSIGHTS_CONNECTION_STRING="$(APP_APPINSIGHTS_CONNECTION_STRING)" \
-                AZURE_CLIENT_ID="$(APP_IDENTITY_PRINCIPAL_ID)" \
+                AZURE_CLIENT_ID="$(APP_IDENTITY_CLIENT_ID)" \
                 AZURE_SDK_TRACING_IMPLEMENTATION="opentelemetry" \
                 AZURE_TRACING_GEN_AI_CONTENT_RECORDING_ENABLED="true" \
                 SEMANTICKERNEL_EXPERIMENTAL_GENAI_ENABLE_OTEL_DIAGNOSTICS="true" \

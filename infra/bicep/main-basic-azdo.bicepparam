@@ -52,7 +52,7 @@ param deployAPIM = empty('#{deployAPIM}#') ? false : toLower('#{deployAPIM}#') =
 param deployUIApp = empty('#{deployUIApp}#') ? false : toLower('#{deployUIApp}#') == 'true'
 param uiImageName = empty('#{UI_IMAGE_NAME}#') ? null : '#{UI_IMAGE_NAME}#'
 
-param addCapHostDelayScripts = empty('#{addCapHostDelayScripts}#') ? true : toLower('#{addCapHostDelayScripts}#') == 'true'
+param addCapHostDelayScripts = empty('#{ADD_CAPHOST_DELAY}#') ? true : toLower('#{ADD_CAPHOST_DELAY}#') == 'true'
 
 // // only for Microsoft internal deployments
 // param mockUserUpn = empty('#{MOCK_USER_UPN}#') ? false : toLower('#{MOCK_USER_UPN}#') == 'true' // Mock user UPN for testing purposes

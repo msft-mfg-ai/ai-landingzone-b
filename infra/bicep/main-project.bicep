@@ -21,6 +21,9 @@ param existingAiCentralAppName string = ''
 @description('Existing AI Landing Zone resource group')
 param existingAiCentralResourceGroupName string
 
+@description('Name of existing Cosmos account to reuse?')
+param existingCosmosAccountName string = ''
+
 @description('The environment code (i.e. dev, qa, prod)')
 param environmentName string = ''
 
@@ -103,6 +106,8 @@ var tags = {
 }
 
 var deployVirtualMachine = !empty(vm_username) && !empty(vm_password)
+// Should we deploy a Cosmos or reuse existing?
+var deployCosmos = !empty(existingCosmosAccountName) ? false : true
 
 // --------------------------------------------------------------------------------------------------------------
 // -- Resource Groups -------------------------------------------------------------------------------------------
@@ -232,10 +237,8 @@ module cosmos './modules/database/cosmosdb.bicep' = {
   name: 'cosmos${deploymentSuffix}'
   scope: projectResourceGroup
   params: {
-
-    accountName: resourceNames.outputs.cosmosName
-    //    existingAccountName: resourceNames.outputs.cosmosName
-
+    accountName: deployCosmos ? resourceNames.outputs.cosmosName : ''
+    existingAccountName: deployCosmos ? '' : existingCosmosAccountName
     databaseName: uiDatabaseName
     sessionsDatabaseName: sessionsDatabaseName
     sessionContainerArray: sessionsContainerArray
@@ -314,7 +317,8 @@ module allDnsZones './modules/networking/all-zones.bicep' = if (createDnsZones) 
 // --------------------------------------------------------------------------------------------------------------
 // -- New AI Foundry Project -----------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------
-var aiDependecies = {
+// AI Project - deploying AI projects in sequence
+var aiDependencies = {
   aiSearch: {
     name: searchService.outputs.name
     resourceId: searchService.outputs.id
@@ -342,9 +346,25 @@ module aiProject1 './modules/ai/ai-project-with-caphost.bicep' = {
     foundryName: resourceNames.outputs.rootCogServiceName
     location: location
     projectNo: projectNumber
-    aiDependencies: aiDependecies
-    managedIdentityId: identity.outputs.managedIdentityId
+    aiDependencies: aiDependencies
+    managedIdentityId: identity.outputs.managedIdentityPrincipalId
+    managedIdentityResourceId: identity.outputs.managedIdentityId
     addCapHostDelayScripts: addCapHostDelayScripts
+    storageAccountNameBase: resourceNames.outputs.storageAccountName
   }
   dependsOn: [allDnsZones]
 }
+
+// --------------------------------------------------------------------------------------------------------------
+// -- Outputs ---------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------
+output SUBSCRIPTION_ID string = subscription().subscriptionId
+output AI_FOUNDRY_PROJECT_ID string = aiProject1.outputs.projectId
+output AI_FOUNDRY_PROJECT_NAME string = aiProject1.outputs.projectName
+output AI_HUB_PROJECT_NAME string = resourceNames.outputs.aiHubProjectName
+output AI_SEARCH_ENDPOINT string = searchService.outputs.endpoint
+output COSMOS_CONTAINER_NAME string = uiChatContainerName
+output COSMOS_DATABASE_NAME string = cosmos.outputs.databaseName
+output COSMOS_ENDPOINT string = cosmos.outputs.endpoint
+output STORAGE_ACCOUNT_CONTAINER string = storage.outputs.containerNames[0].name
+output STORAGE_ACCOUNT_NAME string = storage.outputs.name

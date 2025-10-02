@@ -61,7 +61,7 @@ param deployAPIM = empty('#{deployAPIM}#') ? false : toLower('#{deployAPIM}#') =
 param deployUIApp = empty('#{deployUIApp}#') ? false : toLower('#{deployUIApp}#') == 'true'
 param vnetPrefix = empty('#{VNET_PREFIX}#') ? null : '#{VNET_PREFIX}#'
 
-param addCapHostDelayScripts = empty('#{addCapHostDelayScripts}#') ? true : toLower('#{addCapHostDelayScripts}#') == 'true'
+param addCapHostDelayScripts = empty('#{ADD_CAPHOST_DELAY}#') ? true : toLower('#{ADD_CAPHOST_DELAY}#') == 'true'
 
 // applications
 param uiImageName = empty('#{UI_IMAGE_NAME}#') ? null : '#{UI_IMAGE_NAME}#'
