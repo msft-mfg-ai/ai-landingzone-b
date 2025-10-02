@@ -80,8 +80,9 @@ public class ChatController(
         _ = await Task.FromResult(true);
         try
         {
-            _logger.LogInformation($"API Info: Build Number: {BuildInfo.Instance.BuildNumber} Date: {BuildInfo.Instance.BuildDate}");
-            return Ok(new { data = BuildInfo.Instance });
+            var buildinfo = BuildInfo.Create();
+            _logger.LogInformation($"API Info: Build Number: {buildinfo.BuildNumber} Date: {buildinfo.BuildDate}");
+            return Ok(new { data = buildinfo });
         }
         catch (Exception ex)
         {

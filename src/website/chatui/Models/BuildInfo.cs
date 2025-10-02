@@ -74,7 +74,7 @@ public class BuildInfo
         ImageTag = imageTag;
     }
 
-    private static BuildInfo Create()
+    public static BuildInfo Create()
     {
         try
         {
@@ -87,18 +87,17 @@ public class BuildInfo
             var buildInfo = JsonConvert.DeserializeObject<BuildInfo>(json);
             return buildInfo ?? new BuildInfo();
         }
-        catch
+        catch (Exception ex)
         {
             return new BuildInfo
             {
                 BuildDate = string.Empty,
-                BuildNumber = string.Empty,
+                BuildNumber = ex.Message,
                 BuildId = string.Empty,
                 BranchName = string.Empty,
                 CommitHash = string.Empty,
                 ImageTag = string.Empty
             };
         }
-
     }
 }

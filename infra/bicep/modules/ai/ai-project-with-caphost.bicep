@@ -61,6 +61,7 @@ module waitForProjectScript 'waitDeploymentScript.bicep' = {
     seconds: 90
     userManagedIdentityId: managedIdentityId
     addCapHostDelayScripts: addCapHostDelayScripts
+    storageAccountName: toLower('stwaitproj${uniqueString(resourceGroup().id)}1')  
   }
 }
 
@@ -139,6 +140,7 @@ module waitForConnectionsScript 'waitDeploymentScript.bicep' = {
     seconds: 90
     userManagedIdentityId: managedIdentityId
     addCapHostDelayScripts: addCapHostDelayScripts
+    storageAccountName: toLower('stwaitconn${uniqueString(resourceGroup().id)}2')
   }
 }
 
