@@ -116,12 +116,19 @@ jobs:
       # ----------------------------------------------------------------------------------------------------
       # Store the build info in a file for the app to use
       # ----------------------------------------------------------------------------------------------------
-      - task: CmdLine@2
+      - task: PowerShell@2
         displayName: "Put Build Details in buildinfo.json"
-        inputs:
-          script: |
-            echo {"buildDate":"$(runDateTime)","buildNumber":"$(Build.BuildNumber)","buildId":"$(Build.BuildId)","imageTag":"$(Build.BuildId)","branchName":"$(Build.SourceBranchName)","commitHash":"$(Build.SourceVersion)"} > $(buildInfoFileName)
         continueOnError: true
+        inputs:
+          targetType: 'inline'
+          script: |
+            echo "{""buildDate"":""$(runDateTime)"", ""buildNumber"":""$(Build.BuildNumber)"", ""buildId"":""$(Build.BuildId)"", ""imageTag"":""$(Build.BuildId)"", ""branchName"":""$(Build.SourceBranchName)"", ""commitHash"":""$(Build.SourceVersion)""}" > $(buildInfoFileName)
+            echo "##[group]Contents of buildInfo File:"
+            cat $(buildInfoFileName)
+            echo "##[endgroup]"
+            echo "##[group]File info for pipeline workspace:"
+            Get-ChildItem -Path $(System.DefaultWorkingDirectory)/${{ parameters.projectFolderName }} -Recurse
+            echo "##[endgroup]"
 
       # ----------------------------------------------------------------------------------------------------
       # Build the image

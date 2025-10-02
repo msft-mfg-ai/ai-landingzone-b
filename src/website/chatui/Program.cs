@@ -45,7 +45,7 @@ builder.Services.AddSingleton((provider) =>
     // if doing local development and you get error "Token tenant does not match resource tenant", force the tenant
     var vsTenantId = config.VisualStudioTenantId;
     var credential = CredentialsHelper.GetCredentials(vsTenantId, config.UserAssignedManagedIdentityClientId);
-    Console.WriteLine($"Created credentials of type {CredentialsHelper.CredentialType} to access {config.AppAgentEndpoint}");
+    Console.WriteLine($"Created credentials of type {CredentialsHelper.CredentialType} MI: {config.UserAssignedManagedIdentityClientId} to access {config.AppAgentEndpoint}");
     PersistentAgentsClient client = new(config.AppAgentEndpoint, credential);
     return client;
 });

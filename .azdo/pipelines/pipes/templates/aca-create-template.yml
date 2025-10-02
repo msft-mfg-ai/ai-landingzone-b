@@ -127,6 +127,9 @@ jobs:
               --env-vars \
                 AppSettings__AppAgentEndpoint="$(APP_AGENT_ENDPOINT)" \
                 AppSettings__AppAgentId="$(APP_AGENT_ID)" \
+                AppSettings__APPLICATIONINSIGHTS_CONNECTION_STRING="$(APP_APPINSIGHTS_CONNECTION_STRING)" \
+                AppSettings__AZURE_CLIENT_ID="$(APP_IDENTITY_PRINCIPAL_ID)" \
+                AppSettings__UserAssignedManagedIdentityClientId="$(APP_IDENTITY_PRINCIPAL_ID)" \
                 APPLICATIONINSIGHTS_CONNECTION_STRING="$(APP_APPINSIGHTS_CONNECTION_STRING)" \
                 AZURE_CLIENT_ID="$(APP_IDENTITY_PRINCIPAL_ID)" \
                 AZURE_SDK_TRACING_IMPLEMENTATION="opentelemetry" \
