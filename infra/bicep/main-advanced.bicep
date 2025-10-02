@@ -290,7 +290,7 @@ module resourceNames 'resourcenames.bicep' = {
     resourceToken: appendResourceTokens ? resourceToken : ''
     regionCode: regionCode
     instance: instanceNumber
-    numberOfProjects: numberOfProjects
+    numberOfProjects: 1
   }
 }
 
@@ -692,9 +692,7 @@ module documentIntelligence './modules/ai/document-intelligence.bicep' = if (dep
 // AI Foundry Hub and Project V2
 // Imported from https://github.com/adamhockemeyer/ai-agent-experience
 // --------------------------------------------------------------------------------------------------------------
-// AI Project
-var numberOfProjects int = 1 // This is the number of AI Projects to create
-// deploying AI projects in sequence
+// AI Project - deploying AI projects in sequence
 var aiDependencies = {
   aiSearch: {
     name: searchService.outputs.name
@@ -723,8 +721,10 @@ module aiProject './modules/ai/ai-project-with-caphost.bicep' = {
     location: location
     projectNo: 1
     aiDependencies: aiDependencies
-    managedIdentityId: identity.outputs.managedIdentityId
+    managedIdentityId: identity.outputs.managedIdentityPrincipalId
+    managedIdentityResourceId: identity.outputs.managedIdentityId
     addCapHostDelayScripts: addCapHostDelayScripts
+    storageAccountNameBase: resourceNames.outputs.storageAccountName
   }
 }
 

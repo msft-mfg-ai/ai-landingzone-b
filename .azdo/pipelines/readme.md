@@ -35,7 +35,17 @@ To create this variable groups, customize and run this command in the Azure Clou
 
 > Alternatively, you could define these variables in the Azure DevOps Portal on each pipeline, but a variable group is a more repeatable and maintainable way to do it.
 
-> Note: The APP_AGENT_ENDPOINT and APP_AGENT_ID are needed only if you are deploying the sample Chat UI app included in this repository. These should point to an Agent defined in your AI Foundry which will be used by the Chat UI App. You will need to deploy the AI Foundry first, then create the agent, then come back and update these values and deploy the Chat UI App.
+> Note: The `MY_IP_ADDRESS` and `USER_PRINCIPAL_ID` variables are optional and can be skipped.  If you enter those values, the `MY_IP_ADDRESS` will be added to the allowed IP addresses for the resources being created, and the `USER_PRINCIPAL_ID` will be given rights to resources being created. This is very useful for testing and development, but should not be used in production.
+
+```bash
+   # Get your public IP address from a site like https://whatismyipaddress.com/
+   curl ifconfig.me
+```
+
+```bash
+   # Get your User Principal Id from the Azure Portal in the Azure Active Directory > Users > (your user) > Object ID
+   az ad user show --id <yourEmailAddress> --query objectId --output tsv
+```
 
 ```bash
    az login
@@ -50,17 +60,7 @@ To create this variable groups, customize and run this command in the Azure Clou
          INSTANCE_NUMBER='001' `
          MY_IP_ADDRESS='<yourPublicIpAddress>' `
          USER_PRINCIPAL_ID='<yourAdminPrincipalId>' `
-         APP_AGENT_ENDPOINT='<url>' `
-         APP_AGENT_ID='<string>'
 ```
-
-<!-- 
-     CREATED_BY='SomeCreator' `
-     APPLICATION_OWNER='SomeAppOwner' `
-     BUSINESS_OWNER='SomeBusOwner' `
-     COST_CENTER='9999999' `
-     OWNER_EMAIL='applicationowner@company.com' ` 
--->
 
 ## Resource Group Name
 
@@ -71,7 +71,7 @@ If you want to use an existing Resource Group Name or change the format of the `
 Change the following line in those files to whatever you need it to be:
 
 ```bash
-$resourceGroupName="$(resourceGroupPrefix)-$environmentNameLower".ToLower()
+$resourceGroupName="$(RESOURCEGROUP_PREFIX)-$environmentCodeLower-$(INSTANCE_NUMBER)".ToLower()
 ```
 
 ## Create Service Connections and update the Service Connection Variable File
@@ -120,6 +120,29 @@ Customize your deploy by editing the [vars/var-dv.yml](./vars/var-dv.yml) file. 
 The Azure DevOps pipeline files exist in your repository and are defined in the `.azdo/pipelines` folder. However, in order to actually run them, you need to configure each of them using the Azure DevOps portal.
 
 Set up each of the desired pipelines using [these steps](../../docs/CreateNewPipeline.md).
+
+---
+
+## Chat Application Configuration
+
+After your landing zone is deployed and you want to deploy the Chat UI App, there are some additional configurations to be added before you deploy the Chat UI App.  Create the agent in the AI foundry, then make note of the Foundry project endpoint and the agent Id.  In addition, make note of the Application Insights connection string and the User Assigned Managed Identity Client Id created for the app.
+
+In the AI.LZ.Secrets variable group, add the following variables with the appropriate values:
+
+```bash
+APP_AGENT_ENDPOINT='<url>' `
+APP_AGENT_ID='<string>'
+APP_APPINSIGHTS_CONNECTION_STRING='<string>'
+APP_IDENTITY_CLIENT_ID='<string>'
+```
+
+## Chat Application Deploy
+
+When the Container app is first deployed by the landing zone, it is deployed as a stub application.  To deploy the actual application, run the [2-build-deploy-apps-pipeline.yml](2-build-deploy-apps-pipeline.yml) pipeline in the Azure DevOps portal.  This will build the application, push it to the ACR, then deploy it to the Container App environment.
+
+When you choose the `create-build-deploy` option, it will find the variables created above and set up the container app with those values and deploy a new revision of the application.
+
+When you choose the `build-deploy` option, it simply builds the new container image and deploys it and it will not change the container app configuration or settings.
 
 ---
 
