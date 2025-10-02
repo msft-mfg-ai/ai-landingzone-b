@@ -1,0 +1,525 @@
+<mxfile host="app.diagrams.net" modified="2025-10-01T00:00:00.000Z" agent="GitHub Copilot" version="24.0.0" etag="main-advanced-bicep" type="device">
+  <diagram name="Azure AI Landing Zone - Advanced" id="advanced-architecture">
+    <mxGraphModel dx="2400" dy="1400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3300" pageHeight="2100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="Azure AI Landing Zone - Advanced Architecture (main-advanced.bicep)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="800" y="40" width="800" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Azure Subscription Boundary -->
+        <mxCell id="azure-subscription" value="Azure Subscription" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5FE;strokeColor=#01579B;verticalAlign=top;fontSize=16;fontStyle=1;align=left;spacingLeft=20;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="100" y="120" width="3000" height="1900" as="geometry" />
+        </mxCell>
+        
+        <!-- Resource Group -->
+        <mxCell id="resource-group" value="Resource Group" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#4A148C;verticalAlign=top;fontSize=14;fontStyle=1;align=left;spacingLeft=15;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="150" y="180" width="2900" height="1820" as="geometry" />
+        </mxCell>
+        
+        <!-- Virtual Network -->
+        <mxCell id="vnet" value="Virtual Network&#xa;10.237.144.0/22" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;verticalAlign=top;fontSize=14;fontStyle=1;align=left;spacingLeft=15;spacingTop=8;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="200" y="280" width="2300" height="1600" as="geometry" />
+        </mxCell>
+        
+        <!-- External Users -->
+        <mxCell id="external-user" value="External Users" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#FFCCBC;strokeColor=#BF360C;" vertex="1" parent="1">
+          <mxGeometry x="40" y="500" width="60" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Internet Cloud -->
+        <mxCell id="internet" value="Internet" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#616161;" vertex="1" parent="1">
+          <mxGeometry x="30" y="700" width="120" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- =========================== -->
+        <!-- Monitoring Layer (Top Right) -->
+        <!-- =========================== -->
+        <mxCell id="monitoring-group" value="Monitoring &amp; Observability" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;verticalAlign=top;fontSize=12;fontStyle=1;align=left;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2600" y="240" width="380" height="260" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="log-analytics" value="Log Analytics&#xa;Workspace&#xa;&#xa;365 day retention" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF59D;strokeColor=#F57F17;" vertex="1" parent="1">
+          <mxGeometry x="2640" y="290" width="140" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="app-insights" value="Application&#xa;Insights&#xa;&#xa;Tracing &amp; Metrics" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF59D;strokeColor=#F57F17;" vertex="1" parent="1">
+          <mxGeometry x="2810" y="290" width="140" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Connection LAW to AppInsights -->
+        <mxCell id="conn-law-appi" value="" style="endArrow=classic;html=1;strokeColor=#F9A825;strokeWidth=2;dashed=1;" edge="1" parent="1" source="log-analytics" target="app-insights">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- =========================== -->
+        <!-- Security Layer (Top Right below monitoring) -->
+        <!-- =========================== -->
+        <mxCell id="security-group" value="Security &amp; Identity" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#C62828;verticalAlign=top;fontSize=12;fontStyle=1;align=left;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2600" y="540" width="380" height="340" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="managed-identity" value="Managed Identity&#xa;(User-Assigned)&#xa;&#xa;Service Auth" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EF9A9A;strokeColor=#B71C1C;" vertex="1" parent="1">
+          <mxGeometry x="2640" y="590" width="140" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="key-vault" value="Key Vault&#xa;&#xa;Secrets &amp;&#xa;Certificates" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EF9A9A;strokeColor=#B71C1C;" vertex="1" parent="1">
+          <mxGeometry x="2810" y="590" width="140" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="kv-secrets" value="Secrets:&#xa;• api-key&#xa;• apimkey&#xa;• appInsights conn&#xa;• entra credentials" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#C62828;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="2640" y="700" width="310" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- =========================== -->
+        <!-- Application Gateway Subnet -->
+        <!-- =========================== -->
+        <mxCell id="subnet-appgw" value="Application Gateway Subnet&#xa;10.237.145.0/24" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#0D47A1;verticalAlign=top;fontSize=11;fontStyle=1;align=left;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="250" y="340" width="340" height="200" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="appgw-pip" value="Public IP&#xa;(Static)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90CAF9;strokeColor=#01579B;" vertex="1" parent="1">
+          <mxGeometry x="280" y="390" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="app-gateway" value="Application Gateway&#xa;WAF_v2&#xa;Zones: 1, 2, 3&#xa;Autoscale: 1-10" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#64B5F6;strokeColor=#01579B;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="410" y="380" width="160" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- =========================== -->
+        <!-- Bastion Subnet -->
+        <!-- =========================== -->
+        <mxCell id="subnet-bastion" value="Bastion Subnet&#xa;10.237.146.64/26" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#0D47A1;verticalAlign=top;fontSize=11;fontStyle=1;align=left;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="250" y="580" width="340" height="200" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="bastion-pip" value="Public IP&#xa;(Static)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90CAF9;strokeColor=#01579B;" vertex="1" parent="1">
+          <mxGeometry x="280" y="630" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="bastion" value="Azure Bastion&#xa;Standard SKU&#xa;Tunneling&#xa;File Copy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#64B5F6;strokeColor=#01579B;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="410" y="620" width="160" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- =========================== -->
+        <!-- Jumpbox Subnet -->
+        <!-- =========================== -->
+        <mxCell id="subnet-jumpbox" value="Jumpbox Subnet&#xa;10.237.146.128/28" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#0D47A1;verticalAlign=top;fontSize=11;fontStyle=1;align=left;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="250" y="820" width="340" height="160" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="jumpbox-vm" value="Windows VM&#xa;Standard_B2s_v2&#xa;128GB OS Disk" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE082;strokeColor=#FF6F00;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="870" width="200" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- =========================== -->
+        <!-- Container Apps Subnet -->
+        <!-- =========================== -->
+        <mxCell id="subnet-appse" value="App Service Environment Subnet&#xa;10.237.144.0/24" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#0D47A1;verticalAlign=top;fontSize=11;fontStyle=1;align=left;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="650" y="340" width="500" height="360" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="ca-environment" value="Container Apps Environment&#xa;Workload Profile: D4 (1-10)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#E65100;verticalAlign=top;fontSize=11;fontStyle=1;align=left;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="690" y="390" width="420" height="280" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="ca-api" value="API Container App&#xa;Port: 8000&#xa;Managed Identity&#xa;ACR Image" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCC80;strokeColor=#E65100;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="730" y="450" width="160" height="90" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="ca-ui" value="UI Container App&#xa;Port: 8001&#xa;Managed Identity&#xa;ACR Image" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCC80;strokeColor=#E65100;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="920" y="450" width="160" height="90" as="geometry" />
+        </mxCell>
+        
+        <!-- Connection UI to API -->
+        <mxCell id="conn-ui-api" value="Internal API" style="endArrow=classic;html=1;strokeColor=#E65100;strokeWidth=2;" edge="1" parent="1" source="ca-ui" target="ca-api">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="ca-config" value="Environment:&#xa;• App Insights&#xa;• AI Foundry Endpoint&#xa;• Cosmos DB&#xa;• APIM (optional)&#xa;• Entra ID (optional)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#E65100;align=left;spacingLeft=8;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="730" y="560" width="350" height="90" as="geometry" />
+        </mxCell>
+        
+        <!-- =========================== -->
+        <!-- Agent Subnet -->
+        <!-- =========================== -->
+        <mxCell id="subnet-agent" value="Agent Subnet&#xa;10.237.146.32/27" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#0D47A1;verticalAlign=top;fontSize=11;fontStyle=1;align=left;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="650" y="740" width="250" height="120" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="agent-compute" value="AI Agent Compute&#xa;Outbound Connectivity" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE082;strokeColor=#FF6F00;" vertex="1" parent="1">
+          <mxGeometry x="680" y="780" width="190" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- =========================== -->
+        <!-- Training Subnet -->
+        <!-- =========================== -->
+        <mxCell id="subnet-train" value="Training Subnet&#xa;10.237.147.0/25" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#0D47A1;verticalAlign=top;fontSize=11;fontStyle=1;align=left;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="650" y="900" width="250" height="120" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="ml-training" value="ML Training&#xa;Workloads" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE082;strokeColor=#FF6F00;" vertex="1" parent="1">
+          <mxGeometry x="680" y="940" width="190" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- =========================== -->
+        <!-- Scoring Subnet -->
+        <!-- =========================== -->
+        <mxCell id="subnet-score" value="Scoring Subnet&#xa;10.237.147.128/25" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#0D47A1;verticalAlign=top;fontSize=11;fontStyle=1;align=left;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="650" y="1060" width="250" height="120" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="ml-scoring" value="ML Inference&#xa;Scoring" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE082;strokeColor=#FF6F00;" vertex="1" parent="1">
+          <mxGeometry x="680" y="1100" width="190" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- =========================== -->
+        <!-- Private Endpoints Subnet -->
+        <!-- =========================== -->
+        <mxCell id="subnet-pe" value="Private Endpoints Subnet&#xa;10.237.146.0/27" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#0D47A1;verticalAlign=top;fontSize=11;fontStyle=1;align=left;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="950" y="740" width="520" height="440" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="pe-kv" value="PE: Key Vault" style="ellipse;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#1A237E;" vertex="1" parent="1">
+          <mxGeometry x="980" y="780" width="110" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="pe-aoai" value="PE: Azure&#xa;OpenAI" style="ellipse;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#1A237E;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="780" width="110" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="pe-search" value="PE: AI Search" style="ellipse;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#1A237E;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="780" width="110" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="pe-cosmos" value="PE: Cosmos DB" style="ellipse;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#1A237E;" vertex="1" parent="1">
+          <mxGeometry x="980" y="870" width="110" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="pe-storage" value="PE: Storage&#xa;(Blob/Queue/Table)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#1A237E;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="870" width="110" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="pe-acr" value="PE: Container&#xa;Registry" style="ellipse;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#1A237E;" vertex="1" parent="1">
+          <mxGeometry x="1260" y="870" width="110" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="pe-docint" value="PE: Document&#xa;Intelligence" style="ellipse;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#1A237E;" vertex="1" parent="1">
+          <mxGeometry x="980" y="960" width="110" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="pe-ca" value="PE: Container&#xa;Apps Env" style="ellipse;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#1A237E;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="960" width="110" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="pe-note" value="All Private Endpoints&#xa;provide private connectivity&#xa;to Azure PaaS services" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8EAF6;strokeColor=#1A237E;fontSize=10;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="980" y="1050" width="250" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- =========================== -->
+        <!-- Private DNS Zones -->
+        <!-- =========================== -->
+        <mxCell id="dns-group" value="Private DNS Zones" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8EAF6;strokeColor=#1A237E;verticalAlign=top;fontSize=11;fontStyle=1;align=left;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1520" y="740" width="360" height="440" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="dns-list" value="• privatelink.vaultcore.azure.net&#xa;• privatelink.openai.azure.com&#xa;• privatelink.search.windows.net&#xa;• privatelink.blob.core.windows.net&#xa;• privatelink.queue.core.windows.net&#xa;• privatelink.table.core.windows.net&#xa;• privatelink.documents.azure.com&#xa;• privatelink.azurecr.io&#xa;• privatelink.azurecontainerapps.io&#xa;• privatelink.cognitiveservices.azure.com&#xa;&#xa;All linked to VNET for&#xa;name resolution" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#1A237E;align=left;spacingLeft=10;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1540" y="780" width="320" height="380" as="geometry" />
+        </mxCell>
+        
+        <!-- =========================== -->
+        <!-- AI Services (Outside VNET) -->
+        <!-- =========================== -->
+        <mxCell id="ai-group" value="AI &amp; Cognitive Services" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#4A148C;verticalAlign=top;fontSize=12;fontStyle=1;align=left;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2600" y="920" width="380" height="680" as="geometry" />
+        </mxCell>
+        
+        <!-- AI Foundry Hub -->
+        <mxCell id="ai-foundry" value="Azure AI Foundry" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CE93D8;strokeColor=#4A148C;verticalAlign=top;fontSize=11;fontStyle=1;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="2640" y="970" width="300" height="440" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="ai-hub" value="AI Foundry Hub&#xa;(Cognitive Services)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BA68C8;strokeColor=#4A148C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="2680" y="1010" width="220" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="ai-project" value="AI Project&#xa;with Capability Host" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BA68C8;strokeColor=#4A148C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="2680" y="1090" width="220" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="ai-models" value="AI Models" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#4A148C;verticalAlign=top;fontSize=10;fontStyle=1;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="2680" y="1170" width="220" height="220" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="model-gpt4o" value="GPT-4o&#xa;2024-11-20, 10 TPM" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#4A148C;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="2700" y="1200" width="180" height="35" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="model-gpt41" value="GPT-4.1&#xa;2025-04-14, 10 TPM" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#4A148C;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="2700" y="1245" width="180" height="35" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="model-gpt35" value="gpt-35-turbo&#xa;0125" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#4A148C;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="2700" y="1290" width="180" height="35" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="model-embed" value="text-embedding-ada-002&#xa;v2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#4A148C;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="2700" y="1335" width="180" height="35" as="geometry" />
+        </mxCell>
+        
+        <!-- AI Search -->
+        <mxCell id="ai-search" value="Azure AI Search&#xa;Basic SKU&#xa;Vector Search&#xa;RBAC Auth" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CE93D8;strokeColor=#4A148C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="2640" y="1440" width="140" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Document Intelligence -->
+        <mxCell id="doc-intel" value="Document&#xa;Intelligence&#xa;Form Recognition" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#CE93D8;strokeColor=#4A148C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="2800" y="1440" width="140" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- =========================== -->
+        <!-- Data Services (Outside VNET) -->
+        <!-- =========================== -->
+        <mxCell id="data-group" value="Data Layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#1B5E20;verticalAlign=top;fontSize=12;fontStyle=1;align=left;spacingLeft=10;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2600" y="1640" width="380" height="340" as="geometry" />
+        </mxCell>
+        
+        <!-- Cosmos DB -->
+        <mxCell id="cosmos-db" value="Cosmos DB (NoSQL)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#A5D6A7;strokeColor=#1B5E20;verticalAlign=top;fontSize=11;fontStyle=1;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="2640" y="1690" width="160" height="260" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="cosmos-account" value="Account (RBAC)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#81C784;strokeColor=#1B5E20;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="2660" y="1720" width="120" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="cosmos-db1" value="DB: ChatHistory&#xa;• AgentLog&#xa;• UserDocuments&#xa;• ChatTurn&#xa;• ChatHistory" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#1B5E20;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="2660" y="1760" width="120" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="cosmos-db2" value="DB: sessions&#xa;• apisessions&#xa;• uisessions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#1B5E20;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="2660" y="1850" width="120" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Storage Account -->
+        <mxCell id="storage-account" value="Storage Account" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#A5D6A7;strokeColor=#1B5E20;verticalAlign=top;fontSize=11;fontStyle=1;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="2820" y="1690" width="140" height="260" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="storage-acc" value="Account v2&#xa;(RBAC)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#81C784;strokeColor=#1B5E20;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="2840" y="1720" width="100" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="storage-blob1" value="data" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#1B5E20;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="2840" y="1770" width="100" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="storage-blob2" value="batch-input" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#1B5E20;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="2840" y="1810" width="100" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="storage-blob3" value="batch-output" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#1B5E20;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="2840" y="1850" width="100" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- =========================== -->
+        <!-- Container Registry -->
+        <!-- =========================== -->
+        <mxCell id="acr" value="Azure Container Registry&#xa;Premium SKU&#xa;Private Endpoint&#xa;Images: API &amp; UI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCC80;strokeColor=#E65100;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="1220" width="200" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- =========================== -->
+        <!-- API Management (Optional) -->
+        <!-- =========================== -->
+        <mxCell id="apim" value="API Management&#xa;(Optional)&#xa;Gateway &amp; Policies&#xa;Rate Limiting" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B39DDB;strokeColor=#4A148C;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="1360" width="200" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- ============================= -->
+        <!-- Connections and Arrows -->
+        <!-- ============================= -->
+        
+        <!-- External User to App Gateway -->
+        <mxCell id="conn-user-appgw" value="HTTPS" style="endArrow=classic;html=1;strokeColor=#1976D2;strokeWidth=3;" edge="1" parent="1" source="external-user" target="appgw-pip">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- App Gateway to Container Apps -->
+        <mxCell id="conn-appgw-ca" value="Routes" style="endArrow=classic;html=1;strokeColor=#1976D2;strokeWidth=2;" edge="1" parent="1" source="app-gateway" target="ca-environment">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- External User to Bastion -->
+        <mxCell id="conn-user-bastion" value="Azure Portal" style="endArrow=classic;html=1;strokeColor=#1976D2;strokeWidth=2;dashed=1;" edge="1" parent="1" source="external-user" target="bastion-pip">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Bastion to VM -->
+        <mxCell id="conn-bastion-vm" value="RDP/SSH" style="endArrow=classic;html=1;strokeColor=#1976D2;strokeWidth=2;" edge="1" parent="1" source="bastion" target="jumpbox-vm">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Container Apps to Private Endpoints -->
+        <mxCell id="conn-ca-pe-aoai" value="" style="endArrow=classic;html=1;strokeColor=#7B1FA2;strokeWidth=2;dashed=1;" edge="1" parent="1" source="ca-api" target="pe-aoai">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-ca-pe-search" value="" style="endArrow=classic;html=1;strokeColor=#7B1FA2;strokeWidth=2;dashed=1;" edge="1" parent="1" source="ca-api" target="pe-search">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-ca-pe-cosmos" value="" style="endArrow=classic;html=1;strokeColor=#388E3C;strokeWidth=2;dashed=1;" edge="1" parent="1" source="ca-api" target="pe-cosmos">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-ca-pe-storage" value="" style="endArrow=classic;html=1;strokeColor=#388E3C;strokeWidth=2;dashed=1;" edge="1" parent="1" source="ca-api" target="pe-storage">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-ca-pe-kv" value="" style="endArrow=classic;html=1;strokeColor=#C62828;strokeWidth=2;dashed=1;" edge="1" parent="1" source="ca-api" target="pe-kv">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-ca-pe-acr" value="Pull Images" style="endArrow=classic;html=1;strokeColor=#E65100;strokeWidth=2;dashed=1;" edge="1" parent="1" source="ca-environment" target="pe-acr">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Private Endpoints to Services -->
+        <mxCell id="conn-pe-aoai-service" value="" style="endArrow=classic;html=1;strokeColor=#7B1FA2;strokeWidth=2;entryX=0;entryY=0.5;exitX=1;exitY=0.5;" edge="1" parent="1" source="pe-aoai" target="ai-hub">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-pe-search-service" value="" style="endArrow=classic;html=1;strokeColor=#7B1FA2;strokeWidth=2;entryX=0;entryY=0.5;exitX=1;exitY=0.5;" edge="1" parent="1" source="pe-search" target="ai-search">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-pe-cosmos-service" value="" style="endArrow=classic;html=1;strokeColor=#388E3C;strokeWidth=2;entryX=0;entryY=0.5;exitX=1;exitY=0.5;" edge="1" parent="1" source="pe-cosmos" target="cosmos-account">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-pe-storage-service" value="" style="endArrow=classic;html=1;strokeColor=#388E3C;strokeWidth=2;entryX=0;entryY=0.5;exitX=1;exitY=0.5;" edge="1" parent="1" source="pe-storage" target="storage-acc">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-pe-kv-service" value="" style="endArrow=classic;html=1;strokeColor=#C62828;strokeWidth=2;entryX=0;entryY=0.5;exitX=1;exitY=0.5;" edge="1" parent="1" source="pe-kv" target="key-vault">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-pe-acr-service" value="" style="endArrow=classic;html=1;strokeColor=#E65100;strokeWidth=2;entryX=0.5;entryY=1;exitX=0.5;exitY=0;" edge="1" parent="1" source="pe-acr" target="acr">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-pe-docint-service" value="" style="endArrow=classic;html=1;strokeColor=#7B1FA2;strokeWidth=2;entryX=0;entryY=0.5;exitX=1;exitY=0.5;" edge="1" parent="1" source="pe-docint" target="doc-intel">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Managed Identity to Services -->
+        <mxCell id="conn-mi-kv" value="RBAC" style="endArrow=classic;html=1;strokeColor=#C62828;strokeWidth=1;dashed=1;" edge="1" parent="1" source="managed-identity" target="key-vault">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-mi-aoai" value="RBAC" style="endArrow=classic;html=1;strokeColor=#C62828;strokeWidth=1;dashed=1;entryX=1;entryY=0.25;" edge="1" parent="1" source="managed-identity" target="ai-hub">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-mi-search" value="RBAC" style="endArrow=classic;html=1;strokeColor=#C62828;strokeWidth=1;dashed=1;entryX=1;entryY=0.5;" edge="1" parent="1" source="managed-identity" target="ai-search">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-mi-cosmos" value="RBAC" style="endArrow=classic;html=1;strokeColor=#C62828;strokeWidth=1;dashed=1;entryX=1;entryY=0.25;" edge="1" parent="1" source="managed-identity" target="cosmos-account">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-mi-storage" value="RBAC" style="endArrow=classic;html=1;strokeColor=#C62828;strokeWidth=1;dashed=1;entryX=1;entryY=0.25;" edge="1" parent="1" source="managed-identity" target="storage-acc">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Container Apps to Managed Identity -->
+        <mxCell id="conn-ca-mi" value="Uses" style="endArrow=classic;html=1;strokeColor=#C62828;strokeWidth=2;dashed=1;entryX=0;entryY=0.5;" edge="1" parent="1" source="ca-api" target="managed-identity">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- AI Project Dependencies -->
+        <mxCell id="conn-project-search" value="Connected" style="endArrow=classic;html=1;strokeColor=#7B1FA2;strokeWidth=1;dashed=1;" edge="1" parent="1" source="ai-project" target="ai-search">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-project-cosmos" value="Connected" style="endArrow=classic;html=1;strokeColor=#7B1FA2;strokeWidth=1;dashed=1;entryX=0.75;entryY=0;" edge="1" parent="1" source="ai-project" target="cosmos-account">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-project-storage" value="Connected" style="endArrow=classic;html=1;strokeColor=#7B1FA2;strokeWidth=1;dashed=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="ai-project" target="storage-acc">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Monitoring Connections -->
+        <mxCell id="conn-ca-appi" value="Telemetry" style="endArrow=classic;html=1;strokeColor=#F9A825;strokeWidth=2;dashed=1;entryX=0;entryY=0.5;" edge="1" parent="1" source="ca-environment" target="app-insights">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-appgw-law" value="Diagnostics" style="endArrow=classic;html=1;strokeColor=#F9A825;strokeWidth=1;dashed=1;entryX=0;entryY=0.75;" edge="1" parent="1" source="app-gateway" target="log-analytics">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-aoai-appi" value="Diagnostics" style="endArrow=classic;html=1;strokeColor=#F9A825;strokeWidth=1;dashed=1;entryX=0.5;entryY=1;" edge="1" parent="1" source="ai-hub" target="app-insights">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- APIM Optional Connections -->
+        <mxCell id="conn-ca-apim" value="Optional" style="endArrow=classic;html=1;strokeColor=#4A148C;strokeWidth=2;dashed=1;" edge="1" parent="1" source="ca-api" target="apim">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="conn-apim-aoai" value="Backend" style="endArrow=classic;html=1;strokeColor=#4A148C;strokeWidth=2;dashed=1;entryX=0;entryY=0.75;" edge="1" parent="1" source="apim" target="ai-hub">
+          <mxGeometry width="50" height="50" relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend" value="Legend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#616161;verticalAlign=top;fontSize=12;fontStyle=1;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="200" y="1520" width="300" height="360" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-network" value="Network/Subnets" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1976D2;" vertex="1" parent="1">
+          <mxGeometry x="220" y="1560" width="120" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-compute" value="Compute" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#E65100;" vertex="1" parent="1">
+          <mxGeometry x="220" y="1600" width="120" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-ai" value="AI Services" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#4A148C;" vertex="1" parent="1">
+          <mxGeometry x="220" y="1640" width="120" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-data" value="Data Layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#1B5E20;" vertex="1" parent="1">
+          <mxGeometry x="220" y="1680" width="120" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-security" value="Security" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#C62828;" vertex="1" parent="1">
+          <mxGeometry x="220" y="1720" width="120" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-monitoring" value="Monitoring" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;" vertex="1" parent="1">
+          <mxGeometry x="220" y="1760" width="120" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-pe" value="Private Endpoint" style="ellipse;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#1A237E;" vertex="1" parent="1">
+          <mxGeometry x="220" y="1800" width="120" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-conn" value="━━━  Data Flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="220" y="1840" width="120" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-conn2" value="- - - -  Private/RBAC" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="220" y="1860" width="120" height="20" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

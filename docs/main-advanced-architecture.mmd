@@ -1,0 +1,250 @@
+%% Azure AI Landing Zone - Advanced Architecture (main-advanced.bicep)
+%% This Mermaid diagram shows the complete infrastructure architecture
+
+graph TB
+    %% External Layer
+    User[External Users]
+    Internet[Internet]
+    
+    %% Azure Boundary
+    subgraph Azure["Azure Subscription"]
+        
+        %% Resource Group
+        subgraph RG["Resource Group"]
+            
+            %% Monitoring Layer
+            subgraph Monitoring["Monitoring & Observability"]
+                LAW[Log Analytics Workspace<br/>365 day retention]
+                AppInsights[Application Insights<br/>Performance & Tracing]
+                LAW -.-> AppInsights
+            end
+            
+            %% Identity & Security Layer
+            subgraph Security["Security & Identity"]
+                MI[Managed Identity<br/>User-Assigned]
+                KV[Key Vault<br/>Secrets & Certificates]
+                KV -->|Stores| Secrets["Secrets:<br/>- api-key<br/>- apimkey<br/>- entra credentials"]
+            end
+            
+            %% Virtual Network
+            subgraph VNET["Virtual Network (10.237.144.0/22)"]
+                
+                %% Ingress Subnet
+                subgraph SubnetAppGw["App Gateway Subnet<br/>(10.237.145.0/24)"]
+                    AppGW[Application Gateway<br/>WAF_v2<br/>Zones: 1,2,3]
+                    AppGWPIP[Public IP<br/>Static]
+                    AppGWPIP -.-> AppGW
+                end
+                
+                %% Bastion Subnet
+                subgraph SubnetBastion["Bastion Subnet<br/>(10.237.146.64/26)"]
+                    Bastion[Azure Bastion<br/>Standard SKU<br/>Tunneling + File Copy]
+                    BastionPIP[Public IP<br/>Static]
+                    BastionPIP -.-> Bastion
+                end
+                
+                %% Jumpbox Subnet
+                subgraph SubnetJumpbox["Jumpbox Subnet<br/>(10.237.146.128/28)"]
+                    VM[Windows VM<br/>Standard_B2s_v2<br/>128GB OS Disk]
+                end
+                
+                %% Container Apps Subnet
+                subgraph SubnetAppSe["App Service Environment Subnet<br/>(10.237.144.0/24)"]
+                    subgraph CAEnv["Container Apps Environment"]
+                        CAAPI[API Container App<br/>Port 8000<br/>Workload: D4]
+                        CAUI[UI Container App<br/>Port 8001<br/>Workload: D4]
+                    end
+                end
+                
+                %% Agent Subnet
+                subgraph SubnetAgent["Agent Subnet<br/>(10.237.146.32/27)"]
+                    AgentCompute[AI Agent Compute<br/>Outbound Connectivity]
+                end
+                
+                %% Private Endpoints Subnet
+                subgraph SubnetPE["Private Endpoints Subnet<br/>(10.237.146.0/27)"]
+                    PE_KV[PE: Key Vault]
+                    PE_AOAI[PE: Azure OpenAI]
+                    PE_Search[PE: AI Search]
+                    PE_Cosmos[PE: Cosmos DB]
+                    PE_Storage[PE: Storage<br/>Blob, Queue, Table]
+                    PE_ACR[PE: Container Registry]
+                    PE_DocInt[PE: Document Intelligence]
+                    PE_CA[PE: Container Apps Env]
+                end
+                
+                %% Training Subnet
+                subgraph SubnetTrain["Training Subnet<br/>(10.237.147.0/25)"]
+                    MLTrain[ML Training<br/>Workloads]
+                end
+                
+                %% Scoring Subnet
+                subgraph SubnetScore["Scoring Subnet<br/>(10.237.147.128/25)"]
+                    MLScore[ML Inference<br/>Scoring]
+                end
+                
+                %% DNS Zones
+                subgraph DNS["Private DNS Zones"]
+                    DNS_KV[privatelink.vaultcore.azure.net]
+                    DNS_AOAI[privatelink.openai.azure.com]
+                    DNS_Search[privatelink.search.windows.net]
+                    DNS_Blob[privatelink.blob.core.windows.net]
+                    DNS_Queue[privatelink.queue.core.windows.net]
+                    DNS_Table[privatelink.table.core.windows.net]
+                    DNS_Cosmos[privatelink.documents.azure.com]
+                    DNS_ACR[privatelink.azurecr.io]
+                    DNS_CA[privatelink.azurecontainerapps.io]
+                end
+            end
+            
+            %% AI Services Layer
+            subgraph AIServices["AI & Cognitive Services"]
+                subgraph AIFoundry["Azure AI Foundry"]
+                    Hub[AI Foundry Hub<br/>Cognitive Services]
+                    Project[AI Project<br/>with Capability Host]
+                    Hub --> Project
+                    
+                    subgraph Models["AI Models"]
+                        GPT4o[GPT-4o<br/>2024-11-20<br/>10 TPM]
+                        GPT41[GPT-4.1<br/>2025-04-14<br/>10 TPM]
+                        GPT35[gpt-35-turbo<br/>0125]
+                        Embed[text-embedding-ada-002<br/>v2]
+                    end
+                    Hub -.-> Models
+                end
+                
+                AISearch[Azure AI Search<br/>Basic SKU<br/>Vector Search]
+                DocInt[Document Intelligence<br/>Form Recognition]
+            end
+            
+            %% Data Services Layer
+            subgraph DataServices["Data Layer"]
+                subgraph CosmosDB["Cosmos DB (NoSQL)"]
+                    CosmosAcc[Cosmos Account<br/>RBAC Auth]
+                    
+                    subgraph DB1["Database: ChatHistory"]
+                        Container1[AgentLog<br/>/requestId]
+                        Container2[UserDocuments<br/>/userId]
+                        Container3[ChatTurn<br/>/chatId]
+                        Container4[ChatHistory<br/>/chatId]
+                    end
+                    
+                    subgraph DB2["Database: sessions"]
+                        Container5[apisessions<br/>/id]
+                        Container6[uisessions<br/>/id]
+                    end
+                    
+                    CosmosAcc --> DB1
+                    CosmosAcc --> DB2
+                end
+                
+                subgraph Storage["Storage Account"]
+                    StorageAcc[Storage Account v2<br/>RBAC Auth]
+                    BlobContainer1[data]
+                    BlobContainer2[batch-input]
+                    BlobContainer3[batch-output]
+                    StorageAcc --> BlobContainer1
+                    StorageAcc --> BlobContainer2
+                    StorageAcc --> BlobContainer3
+                end
+            end
+            
+            %% Container Registry
+            ACR[Azure Container Registry<br/>Premium SKU<br/>Images: API & UI]
+            
+            %% Optional APIM
+            APIM[API Management<br/>Optional<br/>Gateway & Policies]
+        end
+    end
+    
+    %% External Connections
+    User -->|HTTPS| AppGWPIP
+    User -->|Azure Portal| BastionPIP
+    Internet -.->|Outbound| CAEnv
+    
+    %% Application Gateway Flow
+    AppGW -->|Routes to| CAEnv
+    
+    %% Bastion Flow
+    Bastion -->|RDP/SSH| VM
+    
+    %% Container Apps to Registry
+    CAEnv -.->|Pull Images| PE_ACR
+    PE_ACR -.-> ACR
+    
+    %% Container Apps to Identity
+    CAAPI -.->|Uses| MI
+    CAUI -.->|Uses| MI
+    
+    %% Container Apps Internal Communication
+    CAUI -->|Internal API Calls| CAAPI
+    
+    %% API Container App to Services
+    CAAPI -->|Private| PE_AOAI
+    CAAPI -->|Private| PE_Search
+    CAAPI -->|Private| PE_Cosmos
+    CAAPI -->|Private| PE_Storage
+    CAAPI -->|Private| PE_KV
+    CAAPI -->|Private| PE_DocInt
+    
+    %% Private Endpoints to Services
+    PE_AOAI -.-> Hub
+    PE_Search -.-> AISearch
+    PE_Cosmos -.-> CosmosAcc
+    PE_Storage -.-> StorageAcc
+    PE_KV -.-> KV
+    PE_DocInt -.-> DocInt
+    
+    %% AI Foundry Dependencies
+    Project -.->|Connected| AISearch
+    Project -.->|Connected| StorageAcc
+    Project -.->|Connected| CosmosAcc
+    
+    %% APIM Integration (Optional)
+    CAAPI -.->|Optional| APIM
+    APIM -.->|Backend| Hub
+    
+    %% Managed Identity RBAC
+    MI -.->|RBAC: Secrets User| KV
+    MI -.->|RBAC: OpenAI User| Hub
+    MI -.->|RBAC: Contributor| AISearch
+    MI -.->|RBAC: Data Contributor| CosmosAcc
+    MI -.->|RBAC: Blob/Table Contributor| StorageAcc
+    MI -.->|RBAC: AcrPull| ACR
+    
+    %% Monitoring Connections
+    AppGW -.->|Diagnostics| LAW
+    CAEnv -.->|Logs & Metrics| LAW
+    CAAPI -.->|Telemetry| AppInsights
+    CAUI -.->|Telemetry| AppInsights
+    Hub -.->|Diagnostics| AppInsights
+    CosmosAcc -.->|Diagnostics| LAW
+    StorageAcc -.->|Diagnostics| LAW
+    
+    %% DNS Resolution
+    PE_KV -.-> DNS_KV
+    PE_AOAI -.-> DNS_AOAI
+    PE_Search -.-> DNS_Search
+    PE_Storage -.-> DNS_Blob
+    PE_Storage -.-> DNS_Queue
+    PE_Storage -.-> DNS_Table
+    PE_Cosmos -.-> DNS_Cosmos
+    PE_ACR -.-> DNS_ACR
+    PE_CA -.-> DNS_CA
+    
+    %% Styling
+    classDef networking fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
+    classDef compute fill:#FFE0B2,stroke:#F57C00,stroke-width:2px
+    classDef ai fill:#E1BEE7,stroke:#7B1FA2,stroke-width:2px
+    classDef data fill:#C8E6C9,stroke:#388E3C,stroke-width:2px
+    classDef security fill:#FFCDD2,stroke:#C62828,stroke-width:2px
+    classDef monitoring fill:#FFF9C4,stroke:#F9A825,stroke-width:2px
+    classDef external fill:#ECEFF1,stroke:#455A64,stroke-width:2px
+    
+    class VNET,SubnetAppGw,SubnetBastion,SubnetJumpbox,SubnetAppSe,SubnetAgent,SubnetPE,SubnetTrain,SubnetScore,AppGW,Bastion,DNS networking
+    class CAEnv,CAAPI,CAUI,VM,ACR,AgentCompute,MLTrain,MLScore compute
+    class AIServices,AIFoundry,Hub,Project,Models,GPT4o,GPT41,GPT35,Embed,AISearch,DocInt ai
+    class DataServices,CosmosDB,CosmosAcc,DB1,DB2,Storage,StorageAcc data
+    class Security,MI,KV,Secrets security
+    class Monitoring,LAW,AppInsights monitoring
+    class User,Internet external
