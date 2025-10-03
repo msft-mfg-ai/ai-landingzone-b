@@ -27,13 +27,13 @@ on:
         options:
           - build-deploy
           - create-build-deploy
-      runMSSecurityScan:
-        description: Run MS DevSecOps Security Scan
-        required: false
-        default: false
-        type: boolean
       updateACRFirewall:
         description: Update ACR Firewall
+        required: false
+        default: true
+        type: boolean
+      runMSSecurityScan:
+        description: Run MS DevSecOps Security Scan
         required: false
         default: false
         type: boolean
