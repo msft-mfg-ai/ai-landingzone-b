@@ -78,7 +78,7 @@ jobs:
           readonly commitsha=${GITHUB_SHA::6}
           echo "commitsha=$commitsha" >> $GITHUB_OUTPUT
 
-          IMAGE_VERSION="$(echo $TAG) | tr '[:upper:]' '[:lower:]')"
+          IMAGE_VERSION=$TAG
           echo "IMAGE_VERSION=$IMAGE_VERSION" >> $GITHUB_OUTPUT
           IMAGE_NAME="$(echo ${{ inputs.ACR_REPO_NAME }}/${{ inputs.ACR_APP_NAME }}:$IMAGE_VERSION | tr '[:upper:]' '[:lower:]')"
           echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_OUTPUT
@@ -93,6 +93,7 @@ jobs:
           echo "inputs.ACR_APP_NAME=${{ inputs.ACR_APP_NAME }}"
           echo "inputs.APP_PATH=${{ inputs.APP_PATH }}"
 
+          echo "steps.vars.TAG=${{ steps.vars.outputs.TAG }}"
           echo "steps.vars.IMAGE_VERSION=${{ steps.vars.outputs.IMAGE_VERSION }}"
           echo "steps.vars.IMAGE_NAME=${{ steps.vars.outputs.IMAGE_NAME }}"
 

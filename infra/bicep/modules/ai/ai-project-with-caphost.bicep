@@ -43,13 +43,14 @@ module aiProject './ai-project.bicep' = {
   }
 }
 
+// Wait for the project to be fully created before proceeding
 module waitForProjectScript 'waitDeploymentScript.bicep' = {
   name: 'waitForProjectScript-${projectNo}'
   dependsOn: [aiProject]
   params: {
     name: 'script-wait-proj-${projectNo}'
     location: location
-    seconds: 90
+    seconds: 60
     userManagedIdentityResourceId: managedIdentityResourceId
     userManagedIdentityId: managedIdentityId
     addCapHostDelayScripts: addCapHostDelayScripts
@@ -97,10 +98,25 @@ module aiSearchRoleAssignments '../iam/ai-search-role-assignments.bicep' = {
   }
 }
 
+// Wait for role assignments to propagate
+module waitForRolesScript 'waitDeploymentScript.bicep' = {
+  name: 'waitForRolesScript-${projectNo}'
+  dependsOn: [waitForProjectScript, cosmosAccountRoleAssignments, storageAccountRoleAssignment, aiSearchRoleAssignments]
+  params: {
+    name: 'script-wait-roles-${projectNo}'
+    location: location
+    seconds: 60
+    userManagedIdentityResourceId: managedIdentityResourceId
+    userManagedIdentityId: managedIdentityId
+    addCapHostDelayScripts: addCapHostDelayScripts
+    storageAccountName: '${storageAccountNameBase}ps1'
+  }
+}
+
 // This module creates the capability host for the project and account
 module addProjectCapabilityHost 'add-project-capability-host.bicep' = {
   name: 'capabilityHost-configuration-deployment-${projectNo}'
-  dependsOn: [waitForProjectScript, cosmosAccountRoleAssignments, storageAccountRoleAssignment, aiSearchRoleAssignments]
+  dependsOn: [waitForRolesScript]
   params: {
     accountName: foundryName
     projectName: aiProject.outputs.projectName
@@ -111,13 +127,14 @@ module addProjectCapabilityHost 'add-project-capability-host.bicep' = {
   }
 }
 
+// Wait for the capability host to be fully created before proceeding
 module waitForConnectionsScript 'waitDeploymentScript.bicep' = {
   name: 'waitForConnectionsScript-${projectNo}'
   dependsOn: [addProjectCapabilityHost]
   params: {
     name: 'script-wait-connections-${projectNo}'
     location: location
-    seconds: 90
+    seconds: 60
     userManagedIdentityResourceId: managedIdentityResourceId
     userManagedIdentityId: managedIdentityId
     addCapHostDelayScripts: addCapHostDelayScripts
