@@ -45,11 +45,11 @@ on:
       makeWebAppsPublic:
         description: Make Web Apps Public?
         type: boolean
-        default: true
+        default: false
       runMSSecurityScan:
         description: Run MS DevSecOps Security Scan
         required: false
-        default: true
+        default: false
         type: boolean
 
       # deployAPIM:
