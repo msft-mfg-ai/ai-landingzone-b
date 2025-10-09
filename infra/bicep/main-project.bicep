@@ -239,6 +239,7 @@ module cosmos './modules/database/cosmosdb.bicep' = {
   params: {
     accountName: deployCosmos ? resourceNames.outputs.cosmosName : ''
     existingAccountName: deployCosmos ? '' : existingCosmosAccountName
+    existingCosmosResourceGroupName: deployCosmos ? '' : existingAiCentralResourceGroupName
     databaseName: uiDatabaseName
     sessionsDatabaseName: sessionsDatabaseName
     sessionContainerArray: sessionsContainerArray
